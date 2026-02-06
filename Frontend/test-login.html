@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .btn {
+            background-color: #FF7518;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .btn:hover {
+            background-color: #e06710;
+        }
+        .message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+    </style>
+</head>
+<body>
+    <h2>Test Admin Login</h2>
+    
+    <div id="message"></div>
+    
+    <form id="testLoginForm">
+        <div class="form-group">
+            <input type="email" id="email" class="form-input" placeholder="Email Address" required value="admin@cmrit.ac.in">
+        </div>
+        
+        <div class="form-group">
+            <input type="password" id="password" class="form-input" placeholder="Password" required value="Admin123">
+        </div>
+        
+        <button type="submit" class="btn">Test Login</button>
+    </form>
+    
+    <br>
+    <button onclick="testCounselor()" class="btn" style="background-color: #007bff;">Test Counselor Login</button>
+    
+    <script>
+        // Password validation function
+        function isValidPassword(password) {
+            // Check if password is at least 8 characters
+            if (password.length < 8) {
+                return false;
+            }
+            
+            // Check if password contains at least one uppercase letter
+            if (!/[A-Z]/.test(password)) {
+                return false;
+            }
+            
+            // Check if password contains at least one number
+            if (!/[0-9]/.test(password)) {
+                return false;
+            }
+            
+            return true;
+        }
+        
+        // Show message function
+        function showMessage(message, type = 'info') {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = message;
+            messageDiv.className = 'message ' + type;
+        }
+        
+        // Perform admin login
+        async function performAdminLogin(email, password) {
+            try {
+                const response = await fetch('http://localhost:5000/api/auth/admin/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showMessage('Login successful! Token: ' + data.token, 'success');
+                } else {
+                    showMessage(data.error || 'Login failed. Please try again.', 'error');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showMessage('Login failed. Please try again.', 'error');
+            }
+        }
+        
+        // Form submission
+        document.getElementById('testLoginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            // Validate email domain
+            if (!email.endsWith('@cmrit.ac.in')) {
+                showMessage('Please use a valid @cmrit.ac.in email address', 'error');
+                return;
+            }
+            
+            // Validate password strength
+            if (!isValidPassword(password)) {
+                showMessage('Password must be at least 8 characters with uppercase letter and number', 'error');
+                return;
+            }
+            
+            // Perform actual admin login
+            performAdminLogin(email, password);
+        });
+        
+        // Test counselor login
+        function testCounselor() {
+            document.getElementById('email').value = 'priya.counselor@cmrit.ac.in';
+            document.getElementById('password').value = 'Counselor123';
+            document.getElementById('testLoginForm').dispatchEvent(new Event('submit'));
+        }
+        
+        // Show current credentials
+        console.log('Current working credentials:');
+        console.log('Admin: admin@cmrit.ac.in / Admin123');
+        console.log('Counselor: priya.counselor@cmrit.ac.in / Counselor123');
+    </script>
+</body>
+</html>

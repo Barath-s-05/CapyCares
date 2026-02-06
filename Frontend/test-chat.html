@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Chat with Capy</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+        }
+        
+        .typing-indicator span {
+            height: 8px;
+            width: 8px;
+            background: #fe8400;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 2px;
+            animation: typing 1s infinite;
+        }
+        
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+        
+        #root {
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo-section">
+            <div class="logo">
+                <img src="images/logo.png" alt="CapyCares Logo" class="logo-img">
+            </div>
+            <h1 class="logo-text">Test Chat with Capy</h1>
+        </div>
+        <nav class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="chat-with-capy.html">Chat with Capy</a>
+            <a href="terms-conditions.html">T&C</a>
+            <a href="interests.html">Interests</a>
+            <a href="#" id="logoutLink" style="display: none;">Logout</a>
+            <button class="dark-mode-toggle" id="darkModeToggle">
+                <i class="fas fa-moon"></i>
+                <span>Dark</span>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="chat-container">
+        <div id="root"></div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        // Check if user is logged in and show/hide logout link
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoutLink = document.getElementById('logoutLink');
+            if (logoutLink) {
+                if (localStorage.getItem('userToken')) {
+                    logoutLink.style.display = 'inline-block';
+                    logoutLink.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        logout();
+                    });
+                }
+            }
+        });
+    </script>
+    <script type="text/babel">
+        const { useState, useRef, useEffect } = React;
+        const axios = window.axios;
+        
+        function ChatWithCapy() {
+          const [question, setQuestion] = useState('');
+          const [messages, setMessages] = useState([
+            {
+              id: 1,
+              text: "Hello! I'm Capy, your AI peer support bot. How can I help you today?",
+              isUser: false,
+              timestamp: new Date()
+            }
+          ]);
+          const [isLoading, setIsLoading] = useState(false);
+          const messagesEndRef = useRef(null);
+        
+          const scrollToBottom = () => {
+            messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+          };
+        
+          useEffect(() => {
+            scrollToBottom();
+          }, [messages]);
+        
+          const generateAnswer = async () => {
+            if (!question.trim() || isLoading) return;
+        
+            // Add user message to chat
+            const userMessage = {
+              id: Date.now(),
+              text: question,
+              isUser: true,
+              timestamp: new Date()
+            };
+            
+            setMessages(prev => [...prev, userMessage]);
+            setIsLoading(true);
+            
+            // Clear input
+            const userQuestion = question;
+            setQuestion('');
+        
+            try {
+              // Call the backend API endpoint
+              const response = await axios.post('http://localhost:5000/api/gemini', {
+                question: userQuestion
+              });
+              
+              // Extract the response text
+              const responseText = response.data.candidates[0].content.parts[0].text;
+              
+              // Add AI response to chat
+              const aiMessage = {
+                id: Date.now() + 1,
+                text: responseText,
+                isUser: false,
+                timestamp: new Date()
+              };
+              
+              setMessages(prev => [...prev, aiMessage]);
+            } catch (error) {
+              console.error("Error generating response:", error);
+              
+              // Add error message to chat
+              const errorMessage = {
+                id: Date.now() + 1,
+                text: "Sorry, I'm having trouble responding right now. Please try again in a moment.",
+                isUser: false,
+                timestamp: new Date(),
+                isError: true
+              };
+              
+              setMessages(prev => [...prev, errorMessage]);
+            } finally {
+              setIsLoading(false);
+            }
+          };
+        
+          const handleKeyPress = (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              generateAnswer();
+            }
+          };
+        
+          const quickMessage = (message) => {
+            setQuestion(message);
+          };
+        
+          return (
+            <>
+              {/* Chat Messages */}
+              <div className="chat-messages">
+                {messages.map((message) => (
+                  <div 
+                    key={message.id} 
+                    className={`message ${message.isUser ? 'user' : ''} ${message.isError ? 'error' : ''}`}
+                  >
+                    <div className="message-avatar"></div>
+                    <div className="message-bubble">
+                      {message.text.split('\n').map((line, i) => (
+                        <span key={i}>
+                          {line}
+                          <br />
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+                {isLoading && (
+                  <div className="message">
+                    <div className="message-avatar"></div>
+                    <div className="message-bubble">
+                      <div className="typing-indicator">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+              
+              {/* Chat Input */}
+              <div className="chat-input-container">
+                <div className="chat-input-row">
+                  <input 
+                    type="text" 
+                    className="chat-input" 
+                    placeholder="Type your message..." 
+                    value={question}
+                    onChange={(e) => setQuestion(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    disabled={isLoading}
+                  />
+                  <button 
+                    className="btn" 
+                    style={{ padding: "15px 20px", margin: "0" }}
+                    onClick={generateAnswer}
+                    disabled={isLoading || !question.trim()}
+                  >
+                    <i className="fas fa-paper-plane"></i>
+                  </button>
+                </div>
+                
+                {/* Quick Actions */}
+                <div className="chat-quick-actions">
+                  <button className="quick-action-btn" onClick={() => quickMessage('Need study tips')}>
+                    Need study tips
+                  </button>
+                  <button className="quick-action-btn" onClick={() => quickMessage('Just want to talk')}>
+                    Just want to talk
+                  </button>
+                </div>
+              </div>
+            </>
+          );
+        }
+        
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<ChatWithCapy />);
+    </script>
+</body>
+</html>

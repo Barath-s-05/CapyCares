@@ -1,0 +1,25 @@
+[
+  {
+    "student": "64a0f1e7d9c1a2b3c4d5e6f4",
+    "reason": "High stress levels and family issues affecting academic performance",
+    "riskLevel": "high",
+    "resolved": false,
+    "urgencyScore": 8,
+    "contactMethods": [
+      {
+        "type": "email",
+        "value": "rajesh23csds@cmrit.ac.in",
+        "preferred": true
+      },
+      {
+        "type": "in-person",
+        "value": "Counseling Center, Room 205",
+        "preferred": false
+      }
+    ],
+    "automaticReminders": {
+      "enabled": true,
+      "frequency": "daily"
+    }
+  }
+]

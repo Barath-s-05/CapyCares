@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms & Conditions - CapyCares</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo-section">
+            <div class="logo">
+                <!-- Logo placeholder - replace 'images/logo.png' with your logo -->
+                <img src="images/logo.png" alt="CapyCares Logo" class="logo-img">
+            </div>
+            <h1 class="logo-text">CapyCares</h1>
+        </div>
+        <nav class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="chat-with-capy.html">Chat with Capy</a>
+            <a href="terms-conditions.html">T&C</a>
+            <a href="interests.html">Interests</a>
+            <a href="#" id="logoutLink" style="display: none;">Logout</a>
+            <button class="dark-mode-toggle" id="darkModeToggle">
+                <i class="fas fa-moon"></i>
+                <span>Dark</span>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="terms-container">
+        <h1 style="text-align: center; color: var(--primary-orange); margin-bottom: 40px;">Terms & Conditions</h1>
+        
+        <div class="terms-content-wrapper">
+            <!-- Left Side - Image -->
+            <div class="terms-image-section">
+                <div class="terms-illustration"></div>
+            </div>
+            
+            <!-- Right Side - Terms Content -->
+            <div class="terms-text-section">
+                <div class="terms-section">
+                    <h3>1. Acceptance of Terms</h3>
+                    <p>By accessing and using CapyCares, you accept and agree to be bound by the terms and provision of this agreement.</p>
+                </div>
+                
+                <div class="terms-section">
+                    <h3>2. Use License</h3>
+                    <p>Permission is granted to temporarily use CapyCares for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title.</p>
+                </div>
+                
+                <div class="terms-section">
+                    <h3>3. Privacy Policy</h3>
+                    <p>Your privacy is important to us. Our Privacy Policy explains how we collect, use, and protect your information when you use our service.</p>
+                </div>
+                
+                <div class="terms-section">
+                    <h3>4. User Conduct</h3>
+                    <p>Users must maintain respectful communication and follow community guidelines. Harassment, spam, or inappropriate content is not permitted.</p>
+                </div>
+                
+                <div class="terms-section">
+                    <h3>5. Disclaimer</h3>
+                    <p>CapyCares is an AI-powered peer support platform. While we strive to provide helpful support, our service should not replace professional mental health care when needed.</p>
+                </div>
+                
+                <div class="terms-section">
+                    <h3>6. Contact Information</h3>
+                    <p>If you have any questions about these Terms & Conditions, please contact us through our support channels.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 40px;">
+            <a href="index.html" class="btn">Back to Home</a>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        // Check if user is logged in and show/hide logout link
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoutLink = document.getElementById('logoutLink');
+            if (logoutLink) {
+                if (localStorage.getItem('userToken')) {
+                    logoutLink.style.display = 'inline-block';
+                    logoutLink.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        logout();
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+</html>

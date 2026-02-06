@@ -1,0 +1,52 @@
+[
+  {
+    "student": "64a0f1e7d9c1a2b3c4d5e6f1",
+    "moodType": "happy",
+    "moodScore": 8,
+    "messageExtract": "Had a great day working on my project with the team",
+    "severityScore": 2,
+    "riskLevel": "low",
+    "moodTrend": "stable",
+    "dailyAverage": 7.5,
+    "triggers": ["academic"],
+    "copingStrategies": ["exercise", "music"]
+  },
+  {
+    "student": "64a0f1e7d9c1a2b3c4d5e6f1",
+    "moodType": "stressed",
+    "moodScore": 4,
+    "messageExtract": "Feeling overwhelmed with upcoming exams and project deadlines",
+    "severityScore": 7,
+    "riskLevel": "medium",
+    "moodTrend": "declining",
+    "dailyAverage": 6.2,
+    "triggers": ["academic"],
+    "copingStrategies": ["deep breathing", "time management"]
+  },
+  {
+    "student": "64a0f1e7d9c1a2b3c4d5e6f4",
+    "moodType": "anxious",
+    "moodScore": 3,
+    "messageExtract": "Worried about family issues affecting my studies",
+    "severityScore": 8,
+    "riskLevel": "high",
+    "moodTrend": "declining",
+    "dailyAverage": 4.5,
+    "flaggedByModel": true,
+    "modelVersion": "1.2.0",
+    "triggers": ["family"],
+    "copingStrategies": ["talking to friends", "counseling"]
+  },
+  {
+    "student": "64a0f1e7d9c1a2b3c4d5e6f5",
+    "moodType": "sad",
+    "moodScore": 5,
+    "messageExtract": "Feeling lonely and disconnected from friends",
+    "severityScore": 6,
+    "riskLevel": "medium",
+    "moodTrend": "stable",
+    "dailyAverage": 5.8,
+    "triggers": ["social"],
+    "copingStrategies": ["joining clubs", "social activities"]
+  }
+]

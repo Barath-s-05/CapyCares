@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Counselor Dashboard - CapyCares</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Dashboard specific styles */
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .dashboard-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+            font-size: 28px;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .dashboard-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 25px;
+        }
+        
+        .dashboard-card:last-child {
+            margin-bottom: 0;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+        }
+        
+        .card-title {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #333;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #fe8400;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .chart-container {
+            height: 100px;
+            margin-top: 15px;
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .chart-bar {
+            width: 30px;
+            background: #fe8400;
+            border-radius: 4px;
+        }
+        
+        .students-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .students-table th {
+            text-align: left;
+            padding: 12px 15px;
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .students-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .students-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .contact-btn {
+            background: #fe8400;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+        
+        .contact-btn:hover {
+            background: #e07600;
+        }
+        
+        .mood-severity {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .severity-high {
+            background: #ffebee;
+            color: #c62828;
+        }
+        
+        .severity-medium {
+            background: #fff8e1;
+            color: #ff8f00;
+        }
+        
+        .severity-low {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+        
+        .search-container {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        .filter-select {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo-section">
+            <div class="logo">
+                <img src="images/logo.png" alt="CapyCares Logo" class="logo-img">
+            </div>
+            <h1 class="logo-text">CapyCares</h1>
+        </div>
+        <nav class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="chat-with-capy.html">Chat with Capy</a>
+            <a href="terms-conditions.html">T&C</a>
+            <a href="counselor-dashboard.html" class="active">Dashboard</a>
+            <a href="#" id="logoutLink" style="display: none;">Logout</a>
+            <button class="dark-mode-toggle" id="darkModeToggle">
+                <i class="fas fa-moon"></i>
+                <span>Dark</span>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="dashboard-container">
+        <h2 class="dashboard-title">Counselor Dashboard</h2>
+        
+        <!-- Stats Grid -->
+        <div class="dashboard-grid">
+            <!-- Flagged Cases -->
+            <div class="dashboard-card">
+                <h3 class="card-title">Flagged Cases This Week</h3>
+                <div class="stat-value">12</div>
+                <div class="stat-label">+3 from last week</div>
+                <div class="chart-container">
+                    <div class="chart-bar" style="height: 40px;"></div>
+                    <div class="chart-bar" style="height: 60px;"></div>
+                    <div class="chart-bar" style="height: 80px;"></div>
+                    <div class="chart-bar" style="height: 60px;"></div>
+                    <div class="chart-bar" style="height: 70px;"></div>
+                    <div class="chart-bar" style="height: 50px;"></div>
+                    <div class="chart-bar" style="height: 65px;"></div>
+                </div>
+            </div>
+            
+            <!-- Overall Wellness -->
+            <div class="dashboard-card">
+                <h3 class="card-title">Overall Wellness Score</h3>
+                <div class="stat-value">7.2/10</div>
+                <div class="stat-label">Campus average</div>
+                <div class="chart-container">
+                    <div style="display: flex; align-items: flex-end; height: 80px; gap: 5px; justify-content: center; width: 100%; margin-top: 15px;">
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <div style="font-size: 10px; margin-bottom: 3px;">Mon</div>
+                            <div style="width: 20px; height: 40px; background: #4CAF50; border-radius: 3px;"></div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <div style="font-size: 10px; margin-bottom: 3px;">Tue</div>
+                            <div style="width: 20px; height: 45px; background: #4CAF50; border-radius: 3px;"></div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <div style="font-size: 10px; margin-bottom: 3px;">Wed</div>
+                            <div style="width: 20px; height: 50px; background: #FFC107; border-radius: 3px;"></div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <div style="font-size: 10px; margin-bottom: 3px;">Thu</div>
+                            <div style="width: 20px; height: 55px; background: #FFC107; border-radius: 3px;"></div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <div style="font-size: 10px; margin-bottom: 3px;">Fri</div>
+                            <div style="width: 20px; height: 60px; background: #FF9800; border-radius: 3px;"></div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <div style="font-size: 10px; margin-bottom: 3px;">Sat</div>
+                            <div style="width: 20px; height: 50px; background: #FF9800; border-radius: 3px;"></div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <div style="font-size: 10px; margin-bottom: 3px;">Sun</div>
+                            <div style="width: 20px; height: 45px; background: #4CAF50; border-radius: 3px;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-around; margin-top: 15px; text-align: center; font-size: 12px;">
+                    <div>
+                        <div style="color: #4CAF50; font-weight: 600;">↑ 5%</div>
+                        <div style="color: #666;">vs last week</div>
+                    </div>
+                    <div>
+                        <div style="color: #fe8400; font-weight: 600;">87%</div>
+                        <div style="color: #666;">participation</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Active Students -->
+            <div class="dashboard-card">
+                <h3 class="card-title">Students at Risk</h3>
+                <div class="stat-value">8</div>
+                <div class="stat-label">Requiring immediate attention</div>
+                <div style="margin-top: 15px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px;">
+                        <span>Severity Distribution</span>
+                        <span>Count</span>
+                    </div>
+                    <div style="margin-bottom: 8px;">
+                        <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                            <div style="flex: 1; height: 8px; background: #ffebee; border-radius: 4px;"></div>
+                            <span style="margin-left: 10px; font-size: 12px; color: #c62828; font-weight: 500;">High (3)</span>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 8px;">
+                        <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                            <div style="flex: 1; height: 8px; background: #fff8e1; border-radius: 4px;"></div>
+                            <span style="margin-left: 10px; font-size: 12px; color: #ff8f00; font-weight: 500;">Medium (4)</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                            <div style="flex: 1; height: 8px; background: #e8f5e9; border-radius: 4px;"></div>
+                            <span style="margin-left: 10px; font-size: 12px; color: #2e7d32; font-weight: 500;">Low (1)</span>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top: 15px; text-align: center;">
+                    <button class="contact-btn" style="padding: 8px 15px; font-size: 14px;">View Details</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Weekly Analytics -->
+        <div class="dashboard-card">
+            <div class="card-title">Weekly Analytics</div>
+            <div class="chart-container" style="height: 120px;">
+                <div style="display: flex; align-items: flex-end; height: 100%; gap: 8px; justify-content: center; width: 100%;">
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <div style="font-size: 12px; margin-bottom: 5px;">Mon</div>
+                        <div style="width: 30px; height: 70px; background: #4CAF50; border-radius: 4px;"></div>
+                        <div style="font-size: 10px; margin-top: 5px;">12</div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <div style="font-size: 12px; margin-bottom: 5px;">Tue</div>
+                        <div style="width: 30px; height: 50px; background: #FFC107; border-radius: 4px;"></div>
+                        <div style="font-size: 10px; margin-top: 5px;">8</div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <div style="font-size: 12px; margin-bottom: 5px;">Wed</div>
+                        <div style="width: 30px; height: 80px; background: #FF9800; border-radius: 4px;"></div>
+                        <div style="font-size: 10px; margin-top: 5px;">15</div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <div style="font-size: 12px; margin-bottom: 5px;">Thu</div>
+                        <div style="width: 30px; height: 60px; background: #2196F3; border-radius: 4px;"></div>
+                        <div style="font-size: 10px; margin-top: 5px;">10</div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <div style="font-size: 12px; margin-bottom: 5px;">Fri</div>
+                        <div style="width: 30px; height: 90px; background: #9C27B0; border-radius: 4px;"></div>
+                        <div style="font-size: 10px; margin-top: 5px;">18</div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <div style="font-size: 12px; margin-bottom: 5px;">Sat</div>
+                        <div style="width: 30px; height: 40px; background: #FE8400; border-radius: 4px;"></div>
+                        <div style="font-size: 10px; margin-top: 5px;">6</div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <div style="font-size: 12px; margin-bottom: 5px;">Sun</div>
+                        <div style="width: 30px; height: 30px; background: #009688; border-radius: 4px;"></div>
+                        <div style="font-size: 10px; margin-top: 5px;">4</div>
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: space-around; margin-top: 20px; text-align: center;">
+                <div>
+                    <div style="font-size: 24px; font-weight: 700; color: #fe8400;">53</div>
+                    <div style="font-size: 14px; color: #666;">Total Cases</div>
+                </div>
+                <div>
+                    <div style="font-size: 24px; font-weight: 700; color: #4CAF50;">87%</div>
+                    <div style="font-size: 14px; color: #666;">Resolution Rate</div>
+                </div>
+                <div>
+                    <div style="font-size: 24px; font-weight: 700; color: #2196F3;">12.4</div>
+                    <div style="font-size: 14px; color: #666;">Avg. Response (hrs)</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Students Table -->
+        <div class="dashboard-card">
+            <div class="card-title">
+                Students at Risk
+                <div style="font-size: 14px; font-weight: normal;">
+                    <button class="contact-btn" style="background: #2e7d32;">Download Report</button>
+                </div>
+            </div>
+            
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Search students...">
+                <select class="filter-select">
+                    <option>All Severity Levels</option>
+                    <option>High Risk</option>
+                    <option>Medium Risk</option>
+                    <option>Low Risk</option>
+                </select>
+            </div>
+            
+            <table class="students-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Mood Severity</th>
+                        <th>Last Mood Log</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Rajesh Kumar</td>
+                        <td>rajesh@cmrit.ac.in</td>
+                        <td><span class="mood-severity severity-high">High</span></td>
+                        <td>"Feeling overwhelmed with exams"</td>
+                        <td><button class="contact-btn">Contact</button></td>
+                    </tr>
+                    <tr>
+                        <td>Priya Sharma</td>
+                        <td>priya@cmrit.ac.in</td>
+                        <td><span class="mood-severity severity-medium">Medium</span></td>
+                        <td>"Struggling with assignments"</td>
+                        <td><button class="contact-btn">Contact</button></td>
+                    </tr>
+                    <tr>
+                        <td>Amit Patel</td>
+                        <td>amit@cmrit.ac.in</td>
+                        <td><span class="mood-severity severity-high">High</span></td>
+                        <td>"Family issues affecting studies"</td>
+                        <td><button class="contact-btn">Contact</button></td>
+                    </tr>
+                    <tr>
+                        <td>Sneha Reddy</td>
+                        <td>sneha@cmrit.ac.in</td>
+                        <td><span class="mood-severity severity-low">Low</span></td>
+                        <td>"Minor stress about upcoming project"</td>
+                        <td><button class="contact-btn">Contact</button></td>
+                    </tr>
+                    <tr>
+                        <td>Vikram Singh</td>
+                        <td>vikram@cmrit.ac.in</td>
+                        <td><span class="mood-severity severity-medium">Medium</span></td>
+                        <td>"Difficulty focusing in class"</td>
+                        <td><button class="contact-btn">Contact</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="dashboard-card">
+            <div class="card-title">Quick Actions</div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 15px;">
+                <div class="quick-action-card" style="background: #f8f9fa; border-radius: 10px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s ease;">
+                    <div style="font-size: 24px; margin-bottom: 10px;">📢</div>
+                    <div style="font-weight: 600; margin-bottom: 5px;">Send Announcement</div>
+                    <div style="font-size: 13px; color: #666;">Broadcast to all students</div>
+                </div>
+                <div class="quick-action-card" style="background: #f8f9fa; border-radius: 10px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s ease;">
+                    <div style="font-size: 24px; margin-bottom: 10px;">👥</div>
+                    <div style="font-weight: 600; margin-bottom: 5px;">Group Session</div>
+                    <div style="font-size: 13px; color: #666;">Schedule wellness workshop</div>
+                </div>
+                <div class="quick-action-card" style="background: #f8f9fa; border-radius: 10px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.3s ease;">
+                    <div style="font-size: 24px; margin-bottom: 10px;">📊</div>
+                    <div style="font-weight: 600; margin-bottom: 5px;">Generate Report</div>
+                    <div style="font-size: 13px; color: #666;">Export analytics data</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add search functionality
+            const searchInput = document.querySelector('.search-input');
+            const tableRows = document.querySelectorAll('.students-table tbody tr');
+            
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                
+                tableRows.forEach(row => {
+                    const name = row.cells[0].textContent.toLowerCase();
+                    const email = row.cells[1].textContent.toLowerCase();
+                    const moodLog = row.cells[3].textContent.toLowerCase();
+                    
+                    if (name.includes(searchTerm) || email.includes(searchTerm) || moodLog.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Add contact button functionality
+            const contactButtons = document.querySelectorAll('.contact-btn');
+            contactButtons.forEach(button => {
+                if (button.textContent === 'Contact') {
+                    button.addEventListener('click', function() {
+                        const row = this.closest('tr');
+                        const studentName = row.cells[0].textContent;
+                        alert(`Contacting ${studentName}. This feature will be implemented in the full version.`);
+                    });
+                }
+            });
+            
+            // Add functionality to "View Details" button in Students at Risk card
+            const viewDetailsBtn = document.querySelector('.dashboard-card .contact-btn');
+            if (viewDetailsBtn) {
+                viewDetailsBtn.addEventListener('click', function() {
+                    // Scroll to the Students at Risk table
+                    const studentsTable = document.querySelector('.students-table').closest('.dashboard-card');
+                    studentsTable.scrollIntoView({ behavior: 'smooth' });
+                    studentsTable.style.boxShadow = '0 0 0 3px #fe8400';
+                    setTimeout(() => {
+                        studentsTable.style.boxShadow = '0 4px 12px rgba(0,0,0,0.05)';
+                    }, 2000);
+                });
+            }
+            
+            // Add quick action functionality
+            const quickActionCards = document.querySelectorAll('.quick-action-card');
+            quickActionCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const actionName = this.querySelector('div[style*="font-weight"]').textContent;
+                    alert(`Initiating "${actionName}". This feature will be implemented in the full version.`);
+                });
+            });
+        });
+    </script>
+    <script>
+        // Check if user is logged in and show/hide logout link
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoutLink = document.getElementById('logoutLink');
+            if (logoutLink) {
+                if (localStorage.getItem('userToken')) {
+                    logoutLink.style.display = 'inline-block';
+                    logoutLink.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        logout();
+                    });
+                }
+            }
+            
+            // Load flagged cases
+            loadFlaggedCases();
+        });
+        
+        // Function to load flagged cases from backend
+        async function loadFlaggedCases() {
+            try {
+                const response = await fetch('http://localhost:5000/api/flagged-cases');
+                const data = await response.json();
+                
+                if (data.success && data.cases.length > 0) {
+                    // Update the flagged cases count
+                    const flaggedCountElement = document.querySelector('.dashboard-grid .dashboard-card:first-child .stat-value');
+                    if (flaggedCountElement) {
+                        // Add to existing count
+                        const currentCount = parseInt(flaggedCountElement.textContent) || 12;
+                        const newCount = currentCount + data.cases.length;
+                        flaggedCountElement.textContent = newCount;
+                    }
+                    
+                    // Update the students at risk count
+                    const studentsAtRiskElement = document.querySelector('.dashboard-card:nth-child(3) .stat-value');
+                    if (studentsAtRiskElement) {
+                        // Add to existing count
+                        const currentCount = parseInt(studentsAtRiskElement.textContent) || 8;
+                        const newCount = currentCount + data.cases.filter(c => c.riskLevel === 'high' || c.riskLevel === 'critical').length;
+                        studentsAtRiskElement.textContent = newCount;
+                    }
+                    
+                    // Update the students table with flagged cases
+                    updateStudentsTable(data.cases);
+                }
+            } catch (error) {
+                console.error('Error loading flagged cases:', error);
+            }
+        }
+        
+        // Function to update students table with flagged cases
+        function updateStudentsTable(cases) {
+            const tableBody = document.querySelector('.students-table tbody');
+            if (!tableBody) return;
+            
+            // Clear existing rows except the sample one
+            const sampleRow = tableBody.querySelector('tr');
+            tableBody.innerHTML = '';
+            
+            // Add flagged cases
+            cases.forEach(caseItem => {
+                const row = document.createElement('tr');
+                
+                // Determine risk level display
+                let riskLevelDisplay = 'Low';
+                let riskClass = 'severity-low';
+                
+                if (caseItem.riskLevel === 'high') {
+                    riskLevelDisplay = 'High';
+                    riskClass = 'severity-high';
+                } else if (caseItem.riskLevel === 'medium') {
+                    riskLevelDisplay = 'Medium';
+                    riskClass = 'severity-medium';
+                } else if (caseItem.riskLevel === 'critical') {
+                    riskLevelDisplay = 'Critical';
+                    riskClass = 'severity-critical';
+                }
+                
+                row.innerHTML = `
+                    <td>${caseItem.student?.name || 'Anonymous'}</td>
+                    <td>${caseItem.student?.email || 'N/A'}</td>
+                    <td><span class="mood-severity ${riskClass}">${riskLevelDisplay}</span></td>
+                    <td>${caseItem.reason || 'N/A'}</td>
+                    <td><button class="contact-btn" onclick="contactStudent('${caseItem.student?._id || ''}')">Contact</button></td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+            
+            // Add the sample row back if it exists
+            if (sampleRow) {
+                tableBody.appendChild(sampleRow);
+            }
+        }
+        
+        // Function to contact a student
+        function contactStudent(studentId) {
+            alert(`Contacting student with ID: ${studentId}. In a full implementation, this would open a communication interface.`);
+        }
+    </script>
+</body>
+</html>

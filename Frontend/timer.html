@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercise Timer - CapyCares</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .timer-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            text-align: center;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+        }
+        
+        .timer-title {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .timer-display {
+            font-size: 72px;
+            font-weight: 700;
+            color: #fe8400;
+            margin: 30px 0;
+        }
+        
+        .timer-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .timer-btn {
+            padding: 12px 25px;
+            font-size: 16px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .start-btn {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .pause-btn {
+            background: #FF9800;
+            color: white;
+        }
+        
+        .reset-btn {
+            background: #f44336;
+            color: white;
+        }
+        
+        .timer-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .exercise-instructions {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: left;
+        }
+        
+        .instruction-title {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .instruction-steps {
+            padding-left: 20px;
+        }
+        
+        .instruction-steps li {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo-section">
+            <div class="logo">
+                <img src="images/logo.png" alt="CapyCares Logo" class="logo-img">
+            </div>
+            <h1 class="logo-text">CapyCares</h1>
+        </div>
+        <nav class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="chat-with-capy.html">Chat with Capy</a>
+            <a href="terms-conditions.html">T&C</a>
+            <a href="student-dashboard.html">Dashboard</a>
+            <a href="#" id="logoutLink" style="display: none;">Logout</a>
+            <button class="dark-mode-toggle" id="darkModeToggle">
+                <i class="fas fa-moon"></i>
+                <span>Dark</span>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div class="timer-container">
+            <h1 class="timer-title" id="exerciseTitle">5-Minute Breathing Exercise</h1>
+            
+            <div class="timer-display" id="timer">5:00</div>
+            
+            <div class="timer-controls">
+                <button class="timer-btn start-btn" id="startBtn">Start</button>
+                <button class="timer-btn pause-btn" id="pauseBtn">Pause</button>
+                <button class="timer-btn reset-btn" id="resetBtn">Reset</button>
+            </div>
+            
+            <div class="exercise-instructions">
+                <h2 class="instruction-title">How to do this exercise:</h2>
+                <ol class="instruction-steps" id="instructions">
+                    <li>Find a comfortable seated or lying position</li>
+                    <li>Close your eyes and take a deep breath in through your nose for 4 seconds</li>
+                    <li>Hold your breath for 4 seconds</li>
+                    <li>Exhale slowly through your mouth for 6 seconds</li>
+                    <li>Repeat this cycle for the duration of the exercise</li>
+                    <li>Focus on your breath and try to clear your mind</li>
+                </ol>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        // Check if user is logged in and show/hide logout link
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoutLink = document.getElementById('logoutLink');
+            if (logoutLink) {
+                if (localStorage.getItem('userToken')) {
+                    logoutLink.style.display = 'inline-block';
+                    logoutLink.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        logout();
+                    });
+                }
+            }
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get URL parameters to determine which exercise to show
+            const urlParams = new URLSearchParams(window.location.search);
+            const exercise = urlParams.get('exercise') || 'breathing';
+            
+            // Update title and instructions based on exercise type
+            const titleElement = document.getElementById('exerciseTitle');
+            const instructionsElement = document.getElementById('instructions');
+            
+            if (exercise === 'walking') {
+                titleElement.textContent = '10-Minute Walking Exercise';
+                instructionsElement.innerHTML = `
+                    <li>Put on comfortable walking shoes</li>
+                    <li>Find a safe place to walk (outdoors or treadmill)</li>
+                    <li>Start with a slow pace to warm up for 1 minute</li>
+                    <li>Increase your pace to a brisk walk</li>
+                    <li>Focus on your breathing and surroundings</li>
+                    <li>Walk for the full 10 minutes</li>
+                    <li>Slow down for the last minute to cool down</li>
+                `;
+                document.getElementById('timer').textContent = '10:00';
+            }
+            
+            // Timer functionality
+            let timerElement = document.getElementById('timer');
+            let startBtn = document.getElementById('startBtn');
+            let pauseBtn = document.getElementById('pauseBtn');
+            let resetBtn = document.getElementById('resetBtn');
+            
+            let timeLeft = exercise === 'walking' ? 600 : 300; // 10 mins or 5 mins in seconds
+            let timerInterval = null;
+            let isRunning = false;
+            
+            function updateTimerDisplay() {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timerElement.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            }
+            
+            function startTimer() {
+                if (!isRunning) {
+                    isRunning = true;
+                    timerInterval = setInterval(() => {
+                        timeLeft--;
+                        updateTimerDisplay();
+                        
+                        if (timeLeft <= 0) {
+                            clearInterval(timerInterval);
+                            isRunning = false;
+                            alert('Exercise completed! Great job taking care of your wellness.');
+                        }
+                    }, 1000);
+                }
+            }
+            
+            function pauseTimer() {
+                if (isRunning) {
+                    clearInterval(timerInterval);
+                    isRunning = false;
+                }
+            }
+            
+            function resetTimer() {
+                pauseTimer();
+                timeLeft = exercise === 'walking' ? 600 : 300;
+                updateTimerDisplay();
+            }
+            
+            startBtn.addEventListener('click', startTimer);
+            pauseBtn.addEventListener('click', pauseTimer);
+            resetBtn.addEventListener('click', resetTimer);
+            
+            // Initialize timer display
+            updateTimerDisplay();
+        });
+    </script>
+</body>
+</html>

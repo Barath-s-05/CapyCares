@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - CapyCares</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Dashboard specific styles */
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .dashboard-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+            font-size: 28px;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .dashboard-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 25px;
+        }
+        
+        .dashboard-card:last-child {
+            margin-bottom: 0;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+        }
+        
+        .card-title {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #fe8400;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .mood-display {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .mood-emoji {
+            font-size: 40px;
+        }
+        
+        .mood-text {
+            font-size: 18px;
+            font-weight: 500;
+        }
+        
+        .exercises-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .exercise-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .exercise-card:hover {
+            background: #e9ecef;
+            transform: scale(1.02);
+        }
+        
+        .exercise-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .exercise-title {
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .quick-link {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            text-decoration: none;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+        
+        .quick-link:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            color: #fe8400;
+        }
+        
+        .link-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: #fe8400;
+        }
+        
+        .link-text {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        /* Events Styles */
+        .events-list {
+            margin-top: 15px;
+        }
+        
+        .event-item {
+            display: flex;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .event-item:last-child {
+            border-bottom: none;
+        }
+        
+        .event-date {
+            min-width: 60px;
+            font-weight: 600;
+            color: #fe8400;
+        }
+        
+        .event-details {
+            flex: 1;
+        }
+        
+        .event-title {
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+        
+        .event-time {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        /* Wellness Tracker Styles */
+        .wellness-insight {
+            display: flex;
+            background: #f0f8ff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .insight-icon {
+            font-size: 20px;
+            margin-right: 10px;
+        }
+        
+        .insight-text {
+            font-size: 14px;
+            color: #333;
+        }
+        
+        /* Wellness Tracker Styles */
+        .wellness-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .wellness-tab {
+            padding: 8px 15px;
+            background: #f0f0f0;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .wellness-tab.active {
+            background: #fe8400;
+            color: white;
+        }
+        
+        .wellness-tab:hover:not(.active) {
+            background: #e0e0e0;
+        }
+        
+        .wellness-actions {
+            margin-top: 20px;
+        }
+        
+        .btn-full-width {
+            width: 100%;
+            background: #fe8400;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        
+        .btn-full-width:hover {
+            background: #e07600;
+        }
+        
+        .wellness-input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 150px;
+        }
+        
+        /* Resources Styles */
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .resource-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .resource-card:hover {
+            background: #e9ecef;
+            transform: translateY(-3px);
+        }
+        
+        .resource-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .resource-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .resource-desc {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        /* Clubs Styles */
+        .club-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .club-item:last-child {
+            border-bottom: none;
+        }
+        
+        .club-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #fe8400;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .club-details {
+            flex: 1;
+        }
+        
+        .club-name {
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+        
+        .club-members {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .chat-btn {
+            background: #fe8400;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+        
+        .chat-btn:hover {
+            background: #e07600;
+        }
+        
+        /* Subject Modal Styles */
+        .subject-modal {
+            display: block;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .subject-modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: slideIn 0.3s ease;
+        }
+        
+        .subject-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            background: #fe8400;
+            color: white;
+            border-radius: 15px 15px 0 0;
+        }
+        
+        .subject-modal-header h3 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 20px;
+        }
+        
+        .close-modal {
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+        }
+        
+        .close-modal:hover {
+            opacity: 0.8;
+        }
+        
+        .subject-details {
+            padding: 20px;
+        }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .detail-value {
+            color: #666;
+            text-align: right;
+        }
+        
+        .subject-item:hover {
+            background-color: #f9f9f9;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .exercises-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .resources-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo-section">
+            <div class="logo">
+                <img src="images/logo.png" alt="CapyCares Logo" class="logo-img">
+            </div>
+            <h1 class="logo-text">CapyCares</h1>
+        </div>
+        <nav class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="chat-with-capy.html">Chat with Capy</a>
+            <a href="terms-conditions.html">T&C</a>
+            <a href="student-dashboard.html" class="active">Dashboard</a>
+            <a href="#" id="logoutLink" style="display: none;">Logout</a>
+            <button class="dark-mode-toggle" id="darkModeToggle">
+                <i class="fas fa-moon"></i>
+                <span>Dark</span>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="dashboard-container">
+        <h2 class="dashboard-title">Student Dashboard</h2>
+        
+        <!-- Stats Grid -->
+        <div class="dashboard-grid">
+            <!-- Academic Marks -->
+            <div class="dashboard-card">
+                <h3 class="card-title">Academic Performance</h3>
+                <div class="stat-value">87%</div>
+                <div class="stat-label">Overall Average</div>
+                <div id="marksChart" style="height: 100px; margin-top: 15px;"></div>
+            </div>
+            
+            <!-- Attendance -->
+            <div class="dashboard-card">
+                <h3 class="card-title">Attendance</h3>
+                <div id="attendanceDetails"></div>
+            </div>
+            
+            <!-- Current Mood -->
+            <div class="dashboard-card">
+                <h3 class="card-title">Current Mood</h3>
+                <div class="mood-display">
+                    <div class="mood-emoji">😊</div>
+                    <div class="mood-text">Feeling Positive</div>
+                </div>
+                <div class="stat-label" style="margin-top: 15px;">Last updated: Today, 10:30 AM</div>
+            </div>
+        </div>
+        
+        <!-- Mood Improvement Exercises -->
+        <div class="dashboard-card">
+            <h3 class="card-title">Mood Improvement Exercises</h3>
+            <div class="exercises-grid">
+                <div class="exercise-card">
+                    <div class="exercise-icon">🧘</div>
+                    <div class="exercise-title">5-Min Breathing</div>
+                </div>
+                <div class="exercise-card">
+                    <div class="exercise-icon">📝</div>
+                    <div class="exercise-title">Gratitude Journal</div>
+                </div>
+                <div class="exercise-card">
+                    <div class="exercise-icon">🚶</div>
+                    <div class="exercise-title">10-Min Walk</div>
+                </div>
+                <div class="exercise-card">
+                    <div class="exercise-icon">🎵</div>
+                    <div class="exercise-title">Listen to Music</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Upcoming Events -->
+        <div class="dashboard-card">
+            <h3 class="card-title">Upcoming Events & Deadlines</h3>
+            <div class="events-list">
+                <div class="event-item">
+                    <div class="event-date">May 15</div>
+                    <div class="event-details">
+                        <div class="event-title">Math Assignment Due</div>
+                        <div class="event-time">11:59 PM</div>
+                    </div>
+                </div>
+                <div class="event-item">
+                    <div class="event-date">May 18</div>
+                    <div class="event-details">
+                        <div class="event-title">Midterm Exams Begin</div>
+                        <div class="event-time">9:00 AM</div>
+                    </div>
+                </div>
+                <div class="event-item">
+                    <div class="event-date">May 22</div>
+                    <div class="event-details">
+                        <div class="event-title">Wellness Workshop</div>
+                        <div class="event-time">2:00 PM - 4:00 PM</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Weekly Wellness Overview -->
+        <div class="dashboard-card">
+            <h3 class="card-title">Weekly Wellness Overview</h3>
+            <div class="wellness-tabs">
+                <div class="wellness-tab active" data-tab="mood">Mood</div>
+                <div class="wellness-tab" data-tab="sleep">Sleep</div>
+                <div class="wellness-tab" data-tab="exercise">Exercise</div>
+                <div class="wellness-tab" data-tab="social">Social</div>
+            </div>
+            <div class="wellness-chart" style="height: 120px; margin: 20px 0;">
+                <div id="wellnessChart" style="display: flex; align-items: flex-end; height: 100%; gap: 5px; justify-content: space-around;">
+                    <!-- Chart will be populated by JavaScript -->
+                </div>
+            </div>
+            <div class="wellness-insight">
+                <div class="insight-icon">💡</div>
+                <div class="insight-text" id="wellnessInsight">Track your wellness metrics to get personalized insights.</div>
+            </div>
+            <div class="wellness-actions">
+                <button class="btn btn-full-width" id="logWellness">Log Today's Wellness</button>
+            </div>
+        </div>
+        
+        <!-- Joined Clubs -->
+        <div class="dashboard-card">
+            <h3 class="card-title">Joined Clubs</h3>
+            <div class="clubs-list" id="joinedClubsList">
+                <!-- Clubs will be dynamically added here -->
+                <div class="club-item" style="padding: 15px; text-align: center; color: #666;">
+                    You haven't joined any clubs yet. <a href="interests.html" style="color: #fe8400; text-decoration: none;">Explore clubs</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Links -->
+        <div class="dashboard-card">
+            <h3 class="card-title">Quick Links</h3>
+            <div class="quick-links">
+                <a href="chat-with-capy.html" class="quick-link">
+                    <div class="link-icon"></div>
+                    <div class="link-text">Chat with Capy</div>
+                </a>
+                <a href="interests.html" class="quick-link">
+                    <div class="link-icon"></div>
+                    <div class="link-text">Clubs</div>
+                </a>
+                <a href="#" class="quick-link">
+                    <div class="link-icon"></div>
+                    <div class="link-text">Mood Log</div>
+                </a>
+                <a href="#" class="quick-link">
+                    <div class="link-icon"></div>
+                    <div class="link-text">Profile</div>
+                </a>
+                <a href="#" class="quick-link">
+                    <div class="link-icon"></div>
+                    <div class="link-text">Schedule</div>
+                </a>
+                <a href="#" class="quick-link">
+                    <div class="link-icon"></div>
+                    <div class="link-text">Resources</div>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Recommended Resources -->
+        <div class="dashboard-card">
+            <h3 class="card-title">Recommended for You</h3>
+            <div class="resources-grid">
+                <div class="resource-card">
+                    <div class="resource-icon"></div>
+                    <div class="resource-title">Study Techniques</div>
+                    <div class="resource-desc">Effective methods for exam preparation</div>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-icon"></div>
+                    <div class="resource-title">Stress Management</div>
+                    <div class="resource-desc">Guided meditation for students</div>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-icon"></div>
+                    <div class="resource-title">Peer Support</div>
+                    <div class="resource-desc">Connect with study buddies</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        // Check if user is logged in and show/hide logout link
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoutLink = document.getElementById('logoutLink');
+            if (logoutLink) {
+                if (localStorage.getItem('userToken')) {
+                    logoutLink.style.display = 'inline-block';
+                    logoutLink.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        logout();
+                    });
+                }
+            }
+        });
+    </script>
+    <script>
+        // Simple chart rendering for marks
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simulate a simple bar chart for marks
+            const chartContainer = document.getElementById('marksChart');
+            const attendanceContainer = document.getElementById('attendanceDetails');
+            
+            if (chartContainer && attendanceContainer) {
+                const subjects = [
+                    'Software Engineering & Project Management',
+                    'Computer Networks',
+                    'Computer Vision',
+                    'Theory of Computation',
+                    'Research Methodology and Intellectual Property Rights',
+                    'Environmental Studies and E-Waste Management',
+                    'TYL_Aptitude',
+                    'TYL Logical Reasoning',
+                    'Data Visualization Lab',
+                    'Computer Networks Lab',
+                    'Technical Training-5th Sem',
+                    'Mini Project',
+                    'Full Stack Development',
+                    'TYL_Soft Skill'
+                ];
+                // Generate random scores for all subjects
+                const scores = subjects.map(() => Math.floor(Math.random() * 30) + 70);
+                // Generate random attendance for all subjects (70-95%)
+                const attendance = subjects.map(() => Math.floor(Math.random() * 25) + 70);
+                
+                // Show only top 5 subjects in chart for better visualization
+                let chartHTML = '<div style="display: flex; align-items: flex-end; height: 100%; gap: 10px; justify-content: center;">';
+                // Create array of subject-score pairs and sort by score
+                const subjectScores = subjects.map((subject, index) => ({
+                    subject: subject,
+                    score: scores[index],
+                    attendance: attendance[index]
+                })).sort((a, b) => b.score - a.score);
+                
+                // Show top 5 subjects
+                subjectScores.slice(0, 5).forEach((item, index) => {
+                    const height = (item.score / 100) * 80;
+                    // Truncate subject name for display
+                    const displayName = item.subject.length > 15 ? item.subject.substring(0, 15) + '...' : item.subject;
+                    chartHTML += `
+                        <div style="display: flex; flex-direction: column; align-items: center; cursor: pointer;" class="subject-bar" data-subject="${item.subject}" data-score="${item.score}" data-attendance="${item.attendance}">
+                            <div style="width: 30px; height: ${height}px; background: #fe8400; border-radius: 4px;"></div>
+                            <div style="font-size: 10px; margin-top: 5px;">${displayName}</div>
+                        </div>
+                    `;
+                });
+                chartHTML += '</div>';
+                chartContainer.innerHTML = chartHTML;
+                
+                // Add click events to subject bars
+                const subjectBars = document.querySelectorAll('.subject-bar');
+                subjectBars.forEach(bar => {
+                    bar.addEventListener('click', function() {
+                        const subjectName = this.getAttribute('data-subject');
+                        const score = this.getAttribute('data-score');
+                        const subjectAttendance = this.getAttribute('data-attendance');
+                        showSubjectDetails(subjectName, score, subjectAttendance);
+                    });
+                });
+                
+                // Add a link to view all subjects
+                const viewAllLink = document.createElement('div');
+                viewAllLink.style.textAlign = 'center';
+                viewAllLink.style.marginTop = '15px';
+                viewAllLink.innerHTML = '<a href="#" id="viewAllSubjects" style="color: #fe8400; text-decoration: none; font-size: 14px;">View All Subjects</a>';
+                chartContainer.parentNode.appendChild(viewAllLink);
+                
+                // Add click event to view all subjects
+                document.getElementById('viewAllSubjects').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showAllSubjects(subjectScores);
+                });
+                
+                // Populate attendance details
+                let attendanceHTML = '<div style="max-height: 200px; overflow-y: auto;">';
+                subjectScores.forEach((item, index) => {
+                    // Truncate subject name for display
+                    const displayName = item.subject.length > 25 ? item.subject.substring(0, 25) + '...' : item.subject;
+                    attendanceHTML += `
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0f0f0;">
+                            <div style="font-size: 14px;">${displayName}</div>
+                            <div style="font-weight: 600; color: ${item.attendance >= 85 ? '#4CAF50' : item.attendance >= 75 ? '#FFC107' : '#F44336'};">${item.attendance}%</div>
+                        </div>
+                    `;
+                });
+                attendanceHTML += '</div>';
+                attendanceContainer.innerHTML = attendanceHTML;
+            }
+            
+            // Add click events to exercise cards
+            const exerciseCards = document.querySelectorAll('.exercise-card');
+            exerciseCards.forEach((card, index) => {
+                card.addEventListener('click', function() {
+                    const exerciseName = this.querySelector('.exercise-title').textContent;
+                    
+                    // Redirect based on exercise type
+                    switch(exerciseName) {
+                        case 'Gratitude Journal':
+                            window.open('https://keep.google.com/', '_blank');
+                            break;
+                        case '5-Min Breathing':
+                            window.location.href = 'timer.html?exercise=breathing';
+                            break;
+                        case '10-Min Walk':
+                            window.location.href = 'timer.html?exercise=walking';
+                            break;
+                        case 'Listen to Music':
+                            window.open('https://open.spotify.com/', '_blank');
+                            break;
+                        default:
+                            alert(`Starting "${exerciseName}" exercise. This feature will be implemented in the full version.`);
+                    }
+                });
+            });
+            
+            // Add click events to resource cards
+            const resourceCards = document.querySelectorAll('.resource-card');
+            resourceCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const resourceName = this.querySelector('.resource-title').textContent;
+                    alert(`Opening "${resourceName}" resource. This feature will be implemented in the full version.`);
+                });
+            });
+            
+            // Initialize joined clubs (in a real app, this would come from the backend)
+            initializeJoinedClubs();
+            
+            // Initialize wellness tracker
+            initializeWellnessTracker();
+        });
+        
+        // Function to initialize joined clubs
+        function initializeJoinedClubs() {
+            // In a real implementation, this would fetch from the backend
+            // For now, we'll simulate with sample data
+            const joinedClubs = JSON.parse(localStorage.getItem('joinedClubs') || '[]');
+            
+            updateJoinedClubsDisplay(joinedClubs);
+        }
+        
+        // Function to update joined clubs display
+        function updateJoinedClubsDisplay(clubs) {
+            const clubsList = document.getElementById('joinedClubsList');
+            
+            if (clubs.length === 0) {
+                clubsList.innerHTML = `
+                    <div class="club-item" style="padding: 15px; text-align: center; color: #666;">
+                        You haven't joined any clubs yet. <a href="interests.html" style="color: #fe8400; text-decoration: none;">Explore clubs</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Clear the list
+            clubsList.innerHTML = '';
+            
+            // Add each club to the list
+            clubs.forEach(club => {
+                const clubItem = document.createElement('div');
+                clubItem.className = 'club-item';
+                
+                // Get first letter of club name for icon
+                const iconLetter = club.name.charAt(0).toUpperCase();
+                
+                clubItem.innerHTML = `
+                    <div class="club-icon">${iconLetter}</div>
+                    <div class="club-details">
+                        <div class="club-name">${club.name}</div>
+                        <div class="club-members">${club.members || 0} members</div>
+                    </div>
+                    <button class="chat-btn" data-club-id="${club.id}">Chat</button>
+                `;
+                
+                clubsList.appendChild(clubItem);
+                
+                // Add click event to chat button
+                const chatBtn = clubItem.querySelector('.chat-btn');
+                chatBtn.addEventListener('click', function() {
+                    const clubId = this.getAttribute('data-club-id');
+                    window.location.href = `community-chat.html?clubId=${encodeURIComponent(clubId)}`;
+                });
+            });
+        }
+        
+        // Function to add a club to joined clubs (called when joining from interests page)
+        function addJoinedClub(clubId, clubName) {
+            const joinedClubs = JSON.parse(localStorage.getItem('joinedClubs') || '[]');
+            
+            // Check if already joined
+            const alreadyJoined = joinedClubs.some(club => club.id === clubId);
+            if (alreadyJoined) return;
+            
+            // Add new club
+            joinedClubs.push({
+                id: clubId,
+                name: clubName,
+                members: Math.floor(Math.random() * 50) + 10 // Random member count for demo
+            });
+            
+            // Save to localStorage
+            localStorage.setItem('joinedClubs', JSON.stringify(joinedClubs));
+            
+            // Update display
+            updateJoinedClubsDisplay(joinedClubs);
+        }
+        
+        // Wellness Tracker Functions
+        function initializeWellnessTracker() {
+            console.log('Initializing wellness tracker');
+            // Load wellness data from localStorage or initialize
+            let wellnessData = JSON.parse(localStorage.getItem('wellnessData')) || {};
+            
+            // Initialize with sample data if empty
+            if (Object.keys(wellnessData).length === 0) {
+                console.log('Initializing with sample wellness data');
+                wellnessData = initializeSampleWellnessData();
+                localStorage.setItem('wellnessData', JSON.stringify(wellnessData));
+                console.log('Sample data initialized:', wellnessData);
+            }
+            
+            // Render initial chart
+            renderWellnessChart('mood', wellnessData);
+            
+            // Add event listeners to tabs
+            const tabs = document.querySelectorAll('.wellness-tab');
+            console.log('Tabs found:', tabs.length);
+            console.log('Found tabs:', tabs.length);
+            console.log('Found tabs:', tabs.length);
+            tabs.forEach((tab, index) => {
+                console.log('Adding event listener to tab', index, tab.getAttribute('data-tab'));
+                tab.addEventListener('click', function() {
+                    console.log('Tab clicked:', this.getAttribute('data-tab'));
+                    // Remove active class from all tabs
+                    tabs.forEach(t => t.classList.remove('active'));
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    // Get tab type
+                    const tabType = this.getAttribute('data-tab');
+                    // Render chart for selected type
+                    renderWellnessChart(tabType, wellnessData);
+                });
+            });
+            
+            // Add event listener to log button
+            const logButton = document.getElementById('logWellness');
+            console.log('Log button found:', !!logButton);
+            if (logButton) {
+                logButton.addEventListener('click', function() {
+                    console.log('Log button clicked');
+                    showWellnessLogModal();
+                });
+            }
+            console.log('Wellness tracker initialized');
+        }
+        
+        function initializeSampleWellnessData() {
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            const data = {};
+            
+            ['mood', 'sleep', 'exercise', 'social'].forEach(type => {
+                data[type] = {};
+                days.forEach(day => {
+                    // Generate random values for each metric
+                    switch(type) {
+                        case 'mood':
+                            data[type][day] = Math.floor(Math.random() * 3) + 3; // 3-5 scale
+                            break;
+                        case 'sleep':
+                            data[type][day] = Math.floor(Math.random() * 3) + 6; // 6-8 hours
+                            break;
+                        case 'exercise':
+                            data[type][day] = Math.floor(Math.random() * 4); // 0-3 sessions
+                            break;
+                        case 'social':
+                            data[type][day] = Math.floor(Math.random() * 4) + 1; // 1-4 interactions
+                            break;
+                    }
+                });
+            });
+            
+            return data;
+        }
+        
+        function renderWellnessChart(type, data) {
+            console.log('Rendering wellness chart for type:', type);
+            const chartContainer = document.getElementById('wellnessChart');
+            if (!chartContainer) return;
+            
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            const today = new Date().toString().substring(0, 3);
+            console.log('Today is:', today);
+            
+            let maxValue = 0;
+            // Find max value for scaling
+            days.forEach(day => {
+                if (data[type] && data[type][day] > maxValue) {
+                    maxValue = data[type][day];
+                }
+            });
+            
+            // Ensure minimum max value for better visualization
+            maxValue = Math.max(maxValue, 5);
+            
+            let chartHTML = '';
+            days.forEach(day => {
+                if (!data[type] || data[type][day] === undefined) return;
+                
+                const value = data[type][day];
+                // Scale height based on maxValue (80px max height)
+                const height = maxValue > 0 ? (value / maxValue) * 80 : 0;
+                
+                // Color coding based on type and value
+                let color = '#FE8400';
+                if (type === 'mood') {
+                    color = value >= 4 ? '#4CAF50' : value >= 3 ? '#FFC107' : '#F44336';
+                } else if (type === 'sleep') {
+                    color = value >= 7 ? '#4CAF50' : value >= 6 ? '#FFC107' : '#F44336';
+                } else if (type === 'exercise') {
+                    color = value >= 2 ? '#4CAF50' : value >= 1 ? '#FFC107' : '#9E9E9E';
+                } else if (type === 'social') {
+                    color = value >= 3 ? '#4CAF50' : value >= 2 ? '#FFC107' : '#9E9E9E';
+                }
+                
+                const displayDay = day === today ? 'Today' : day;
+                
+                chartHTML += `
+                    <div style="display: flex; flex-direction: column; align-items: center;">
+                        <div style="width: 20px; height: ${height}px; background: ${color}; border-radius: 4px;"></div>
+                        <div style="font-size: 10px; margin-top: 5px;">${displayDay}</div>
+                    </div>
+                `;
+            });
+            
+            chartContainer.innerHTML = chartHTML;
+            
+            // Update insight text
+            updateWellnessInsight(type, data);
+        }
+        
+        function updateWellnessInsight(type, data) {
+            console.log('Updating wellness insight for type:', type);
+            const insightElement = document.getElementById('wellnessInsight');
+            if (!insightElement) return;
+            
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            let total = 0;
+            let count = 0;
+            
+            days.forEach(day => {
+                if (data[type] && data[type][day] !== undefined) {
+                    total += data[type][day];
+                    count++;
+                }
+            });
+            
+            const average = count > 0 ? (total / count).toFixed(1) : 0;
+            
+            let insightText = '';
+            switch(type) {
+                case 'mood':
+                    if (average >= 4) {
+                        insightText = 'Your mood has been positive this week! Keep up the great work.';
+                    } else if (average >= 3) {
+                        insightText = 'Your mood is stable. Consider trying some mindfulness exercises.';
+                    } else {
+                        insightText = 'Your mood could use some attention. Reach out to a friend or counselor.';
+                    }
+                    break;
+                case 'sleep':
+                    if (average >= 7) {
+                        insightText = 'Great job maintaining healthy sleep habits!';
+                    } else if (average >= 6) {
+                        insightText = 'Your sleep is okay but could be improved. Try going to bed earlier.';
+                    } else {
+                        insightText = 'You need more sleep. Aim for 7-8 hours each night.';
+                    }
+                    break;
+                case 'exercise':
+                    if (average >= 2) {
+                        insightText = 'You\'re staying active! Keep up the good work.';
+                    } else if (average >= 1) {
+                        insightText = 'You could benefit from more physical activity. Try a short walk daily.';
+                    } else {
+                        insightText = 'Try to incorporate more movement into your routine.';
+                    }
+                    break;
+                case 'social':
+                    if (average >= 3) {
+                        insightText = 'You\'re maintaining good social connections!';
+                    } else if (average >= 2) {
+                        insightText = 'Your social interactions are moderate. Consider joining a club or activity.';
+                    } else {
+                        insightText = 'You might be feeling isolated. Reach out to friends or family.';
+                    }
+                    break;
+                default:
+                    insightText = 'Track your wellness metrics to get personalized insights.';
+            }
+            
+            insightElement.textContent = insightText;
+        }
+        
+        function showWellnessLogModal() {
+            console.log('Showing wellness log modal');
+            // Remove existing modal if any
+            const existingModal = document.querySelector('.subject-modal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Create modal container
+            const modal = document.createElement('div');
+            modal.className = 'subject-modal';
+            modal.innerHTML = `
+                <div class="subject-modal-content">
+                    <div class="subject-modal-header">
+                        <h3>Log Today's Wellness</h3>
+                        <span class="close-modal">&times;</span>
+                    </div>
+                    <div class="subject-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Mood (1-5)</div>
+                            <select id="moodInput" class="wellness-input">
+                                <option value="1">1 - Very Low</option>
+                                <option value="2">2 - Low</option>
+                                <option value="3">3 - Neutral</option>
+                                <option value="4">4 - Good</option>
+                                <option value="5">5 - Excellent</option>
+                            </select>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Sleep Hours</div>
+                            <input type="number" id="sleepInput" class="wellness-input" min="0" max="24" step="0.5" placeholder="e.g. 7.5">
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Exercise Sessions</div>
+                            <input type="number" id="exerciseInput" class="wellness-input" min="0" max="10" placeholder="e.g. 2">
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Social Interactions</div>
+                            <input type="number" id="socialInput" class="wellness-input" min="0" max="20" placeholder="e.g. 3">
+                        </div>
+                        <button class="btn-full-width" id="saveWellness" style="margin-top: 20px;">Save Wellness Data</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Add event listener to close button
+            modal.querySelector('.close-modal').addEventListener('click', function() {
+                document.body.removeChild(modal);
+            });
+            
+            // Close modal when clicking outside
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    document.body.removeChild(modal);
+                }
+            });
+            
+            // Add event listener to save button
+            document.getElementById('saveWellness').addEventListener('click', function() {
+                saveWellnessData();
+                document.body.removeChild(modal);
+                // Refresh the chart
+                initializeWellnessTracker();
+            });
+        }
+        
+        function saveWellnessData() {
+            console.log('Saving wellness data');
+            // Get values from inputs
+            const mood = document.getElementById('moodInput').value;
+            const sleep = document.getElementById('sleepInput').value;
+            const exercise = document.getElementById('exerciseInput').value;
+            const social = document.getElementById('socialInput').value;
+            
+            // Get current day
+            const today = new Date().toString().substring(0, 3);
+            
+            // Load existing data
+            let wellnessData = JSON.parse(localStorage.getItem('wellnessData')) || {};
+            
+            // Update data
+            if (mood) {
+                if (!wellnessData.mood) wellnessData.mood = {};
+                wellnessData.mood[today] = parseInt(mood);
+            }
+            
+            if (sleep) {
+                if (!wellnessData.sleep) wellnessData.sleep = {};
+                wellnessData.sleep[today] = parseFloat(sleep);
+            }
+            
+            if (exercise) {
+                if (!wellnessData.exercise) wellnessData.exercise = {};
+                wellnessData.exercise[today] = parseInt(exercise);
+            }
+            
+            if (social) {
+                if (!wellnessData.social) wellnessData.social = {};
+                wellnessData.social[today] = parseInt(social);
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('wellnessData', JSON.stringify(wellnessData));
+            
+            // Show confirmation
+            alert('Wellness data saved successfully!');
+        }
+        
+        // Function to show subject details in a modal
+        function showSubjectDetails(subjectName, score, attendance) {
+            // Remove existing modal if any
+            const existingModal = document.querySelector('.subject-modal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Create modal container
+            const modal = document.createElement('div');
+            modal.className = 'subject-modal';
+            modal.innerHTML = `
+                <div class="subject-modal-content">
+                    <div class="subject-modal-header">
+                        <h3>${subjectName}</h3>
+                        <span class="close-modal">&times;</span>
+                    </div>
+                    <div class="subject-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Attendance</div>
+                            <div class="detail-value">${attendance || Math.floor(Math.random() * 20) + 80}%</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Marks</div>
+                            <div class="detail-value">${score}%</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Internal Assessments</div>
+                            <div class="detail-value">${Math.floor(Math.random() * 3) + 1}/3 Completed</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Assignments</div>
+                            <div class="detail-value">${Math.floor(Math.random() * 5) + 3}/5 Submitted</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Faculty Name</div>
+                            <div class="detail-value">Prof. ${['Smith', 'Johnson', 'Williams', 'Brown', 'Davis'][Math.floor(Math.random() * 5)]}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Improvement Suggestions</div>
+                            <div class="detail-value">Focus on ${['problem-solving', 'theory concepts', 'practical applications', 'assignments', 'attendance'][Math.floor(Math.random() * 5)]} for better performance</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Add event listener to close button
+            modal.querySelector('.close-modal').addEventListener('click', function() {
+                document.body.removeChild(modal);
+            });
+            
+            // Close modal when clicking outside
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    document.body.removeChild(modal);
+                }
+            });
+        }
+        
+        // Function to show all subjects in a modal
+        function showAllSubjects(subjectScores) {
+            // Remove existing modal if any
+            const existingModal = document.querySelector('.subject-modal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Create modal container
+            const modal = document.createElement('div');
+            modal.className = 'subject-modal';
+            
+            let subjectsHTML = '';
+            subjectScores.forEach((item, index) => {
+                subjectsHTML += `
+                    <div class="subject-item" data-subject="${item.subject}" data-score="${item.score}" data-attendance="${item.attendance}" style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f0f0f0; cursor: pointer;">
+                        <div>${item.subject}</div>
+                        <div style="color: #fe8400; font-weight: 600;">${item.score}%</div>
+                    </div>
+                `;
+            });
+            
+            modal.innerHTML = `
+                <div class="subject-modal-content">
+                    <div class="subject-modal-header">
+                        <h3>All Subjects</h3>
+                        <span class="close-modal">&times;</span>
+                    </div>
+                    <div class="subject-details" style="max-height: 400px; overflow-y: auto;">
+                        ${subjectsHTML}
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Add event listener to close button
+            modal.querySelector('.close-modal').addEventListener('click', function() {
+                document.body.removeChild(modal);
+            });
+            
+            // Close modal when clicking outside
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    document.body.removeChild(modal);
+                }
+            });
+            
+            // Add click events to subject items
+            const subjectItems = modal.querySelectorAll('.subject-item');
+            subjectItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const subjectName = this.getAttribute('data-subject');
+                    const score = this.getAttribute('data-score');
+                    const attendance = this.getAttribute('data-attendance');
+                    document.body.removeChild(modal);
+                    showSubjectDetails(subjectName, score, attendance);
+                });
+            });
+        }
+        
+        // Function to update joined clubs display
+        function updateJoinedClubsDisplay(clubs) {
+            const clubsList = document.getElementById('joinedClubsList');
+            
+            if (clubs.length === 0) {
+                clubsList.innerHTML = `
+                    <div class="club-item" style="padding: 15px; text-align: center; color: #666;">
+                        You haven't joined any clubs yet. <a href="interests.html" style="color: #fe8400; text-decoration: none;">Explore clubs</a>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Clear the list
+            clubsList.innerHTML = '';
+            
+            // Add each club to the list
+            clubs.forEach(club => {
+                const clubItem = document.createElement('div');
+                clubItem.className = 'club-item';
+                
+                // Get first letter of club name for icon
+                const iconLetter = club.name.charAt(0).toUpperCase();
+                
+                clubItem.innerHTML = `
+                    <div class="club-icon">${iconLetter}</div>
+                    <div class="club-details">
+                        <div class="club-name">${club.name}</div>
+                        <div class="club-members">${club.members || 0} members</div>
+                    </div>
+                    <button class="chat-btn" data-club-id="${club.id}">Chat</button>
+                `;
+                
+                clubsList.appendChild(clubItem);
+                
+                // Add click event to chat button
+                const chatBtn = clubItem.querySelector('.chat-btn');
+                chatBtn.addEventListener('click', function() {
+                    const clubId = this.getAttribute('data-club-id');
+                    window.location.href = `community-chat.html?clubId=${encodeURIComponent(clubId)}`;
+                });
+            });
+        }
+        
+        // Function to add a club to joined clubs (called when joining from interests page)
+        function addJoinedClub(clubId, clubName) {
+            const joinedClubs = JSON.parse(localStorage.getItem('joinedClubs') || '[]');
+            
+            // Check if already joined
+            const alreadyJoined = joinedClubs.some(club => club.id === clubId);
+            if (alreadyJoined) return;
+            
+            // Add new club
+            joinedClubs.push({
+                id: clubId,
+                name: clubName,
+                members: Math.floor(Math.random() * 50) + 10 // Random member count for demo
+            });
+            
+            // Save to localStorage
+            localStorage.setItem('joinedClubs', JSON.stringify(joinedClubs));
+            
+            // Update display
+            updateJoinedClubsDisplay(joinedClubs);
+        }
+        
+        // Function to check if user has flagged messages
+        function checkFlaggedStatus() {
+            // In a real implementation, this would check with the backend
+            // For now, we'll check localStorage
+            const flaggedMessages = JSON.parse(localStorage.getItem('flaggedMessages') || '[]');
+            const communityFlaggedMessages = JSON.parse(localStorage.getItem('communityFlaggedMessages') || '[]');
+            
+            if (flaggedMessages.length > 0 || communityFlaggedMessages.length > 0) {
+                // Show a notification to the user
+                const notification = document.createElement('div');
+                notification.className = 'system-message';
+                notification.style.cssText = `
+                    background-color: #fff3cd;
+                    border: 1px solid #ffeaa7;
+                    border-radius: 5px;
+                    padding: 15px;
+                    margin: 20px auto;
+                    max-width: 800px;
+                    text-align: center;
+                    color: #856404;
+                    font-weight: 500;
+                `;
+                notification.innerHTML = `
+                    <strong>⚠️ Notice:</strong> A counselor has been notified about your recent messages. 
+                    They may reach out to you soon to provide support.
+                `;
+                
+                // Insert after the header
+                const header = document.querySelector('header');
+                if (header && header.nextSibling) {
+                    header.parentNode.insertBefore(notification, header.nextSibling);
+                }
+            }
+        }
+        
+        // Check for flagged messages when page loads
+        checkFlaggedStatus();
+    </script>
+</body>
+</html>

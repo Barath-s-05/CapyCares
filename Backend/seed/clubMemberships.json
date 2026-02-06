@@ -1,0 +1,32 @@
+[
+  {
+    "user": "64a0f1e7d9c1a2b3c4d5e6f1",
+    "club": "64a0f1e7d9c1a2b3c4d5e701",
+    "role": "member",
+    "notificationsEnabled": true
+  },
+  {
+    "user": "64a0f1e7d9c1a2b3c4d5e6f1",
+    "club": "64a0f1e7d9c1a2b3c4d5e702",
+    "role": "member",
+    "notificationsEnabled": true
+  },
+  {
+    "user": "64a0f1e7d9c1a2b3c4d5e6f4",
+    "club": "64a0f1e7d9c1a2b3c4d5e702",
+    "role": "member",
+    "notificationsEnabled": true
+  },
+  {
+    "user": "64a0f1e7d9c1a2b3c4d5e6f5",
+    "club": "64a0f1e7d9c1a2b3c4d5e703",
+    "role": "member",
+    "notificationsEnabled": true
+  },
+  {
+    "user": "64a0f1e7d9c1a2b3c4d5e6f2",
+    "club": "64a0f1e7d9c1a2b3c4d5e702",
+    "role": "admin",
+    "notificationsEnabled": true
+  }
+]

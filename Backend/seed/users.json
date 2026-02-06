@@ -1,0 +1,62 @@
+[
+  {
+    "_id": "64a0f1e7d9c1a2b3c4d5e6f1",
+    "name": "Keshav S",
+    "email": "kesh23csds@cmrit.ac.in",
+    "password": "$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj/RK.PZvO.S",
+    "role": "student",
+    "branch": "CSEDS",
+    "section": "A",
+    "semester": 5,
+    "profileCompleteness": 85,
+    "bio": "Interested in AI and mental health tech",
+    "settings": {
+      "notifications": {
+        "email": true,
+        "push": true
+      },
+      "privacy": {
+        "profileVisibility": "friends"
+      }
+    }
+  },
+  {
+    "_id": "64a0f1e7d9c1a2b3c4d5e6f2",
+    "name": "Dr. Priya Sharma",
+    "email": "priya.counselor@cmrit.ac.in",
+    "password": "$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj/RK.PZvO.S",
+    "role": "counselor",
+    "profileCompleteness": 95,
+    "bio": "Counselor specializing in student wellness"
+  },
+  {
+    "_id": "64a0f1e7d9c1a2b3c4d5e6f3",
+    "name": "Admin User",
+    "email": "admin@cmrit.ac.in",
+    "password": "$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj/RK.PZvO.S",
+    "role": "admin",
+    "profileCompleteness": 100
+  },
+  {
+    "_id": "64a0f1e7d9c1a2b3c4d5e6f4",
+    "name": "Rajesh Kumar",
+    "email": "rajesh23csds@cmrit.ac.in",
+    "password": "$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj/RK.PZvO.S",
+    "role": "student",
+    "branch": "CSEDS",
+    "section": "B",
+    "semester": 5,
+    "profileCompleteness": 70
+  },
+  {
+    "_id": "64a0f1e7d9c1a2b3c4d5e6f5",
+    "name": "Sneha Reddy",
+    "email": "sneha23csds@cmrit.ac.in",
+    "password": "$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBPj/RK.PZvO.S",
+    "role": "student",
+    "branch": "CSEDS",
+    "section": "A",
+    "semester": 5,
+    "profileCompleteness": 60
+  }
+]

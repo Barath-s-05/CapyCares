@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Account Creation - CapyCares</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo-section">
+            <div class="logo">
+                <!-- Logo placeholder - replace 'images/logo.png' with your logo -->
+                <img src="images/logo.png" alt="CapyCares Logo" class="logo-img">
+            </div>
+            <h1 class="logo-text">CapyCares</h1>
+        </div>
+        <nav class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="chat-with-capy.html">Chat with Capy</a>
+            <a href="terms-conditions.html">T&C</a>
+            <a href="interests.html">Interests</a>
+            <a href="#" id="logoutLink" style="display: none;">Logout</a>
+            <button class="dark-mode-toggle" id="darkModeToggle">
+                <i class="fas fa-moon"></i>
+                <span>Dark</span>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <h2 class="form-title">Student Account Creation</h2>
+        
+        <div class="hero-section">
+            <!-- Left Section -->
+            <div class="hero-left">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <div class="hero-capy-icon">
+                        <!-- Student signup icon placeholder - replace 'images/student-signup-icon.png' with your icon -->
+                        <img src="images/Logo.png" alt="Student Signup Icon" class="hero-icon-img">
+                    </div>
+                </div>
+                
+                <div class="form-container" style="margin: 0;">
+                    <form id="studentSignupForm">
+                        <div class="form-group">
+                            <input type="text" class="form-input" placeholder="Full Name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="email" class="form-input" placeholder="Email Address" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="password" class="form-input" placeholder="Password" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <input type="password" class="form-input" placeholder="Confirm Password" required>
+                        </div>
+                        
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="agree" required>
+                            <label for="agree">I agree to Terms & Conditions and Privacy Policy</label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-full-width">Create Student Account</button>
+                    </form>
+                    
+                    <div class="form-links">
+                        <a href="#forgot">Forgot Username/Password?</a>
+                        <br><br>
+                        <a href="student-login.html" style="color: #FF7518;">Back to Student Login</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Section -->
+            <div class="hero-right">
+                <div class="illustration-capy" style="max-width: 900px; height: 700px; margin-top: -40px; margin-right: -50px;">
+                    <video autoplay muted loop playsinline preload="auto" class="main-illustration-img" id="heroVideo">
+                        <source src="main.mp4" type="video/mp4">
+                        <source src="videos/Mainn.mp4" type="video/mp4">
+                        <source src="videos/main.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <!-- Student signup illustration placeholder - replace 'images/student-signup-illustration.png' with your image -->
+                    <img src="images/student-signup-illustration.png" alt="Student Signup Illustration" class="main-illustration-img" style="display: none;">
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        // Check if user is logged in and show/hide logout link
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoutLink = document.getElementById('logoutLink');
+            if (logoutLink) {
+                if (localStorage.getItem('userToken')) {
+                    logoutLink.style.display = 'inline-block';
+                    logoutLink.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        logout();
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+</html>

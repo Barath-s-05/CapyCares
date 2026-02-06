@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CapyCares - AI Powered Peer Support Platform</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo-section">
+            <div class="logo">
+               
+                <img src="images/logo.png" alt="CapyCares " class="logo-img">
+            </div>
+            <h1 class="logo-text">CapyCares</h1>
+        </div>
+        <nav class="nav-links">
+            <a href="index.html">About</a>
+            <a href="chat-with-capy.html">Chat with Capy</a>
+            <a href="terms-conditions.html">T&C</a>
+            <a href="interests.html">Interests</a>
+            <a href="#" id="logoutLink" style="display: none;">Logout</a>
+            <button class="dark-mode-toggle" id="darkModeToggle">
+                <i class="fas fa-moon"></i>
+                <span>Dark</span>
+            </button>
+        </nav>
+    </header>
+
+<!-- Main Content -->
+<main class="container">
+    <div class="hero-section">
+        <!-- Left Section -->
+        <div class="hero-left">
+            <div class="hero-title">
+                <div class="hero-capy-icon">
+                    <img src="images/logo.png" alt="Hero Capybara" class="hero-icon-img">
+                </div>
+                <h2 class="hero-text">AI Powered Peer Support Platform</h2>
+            </div>
+
+            <div class="button-container">
+                <div class="button-row">
+                    <a href="student-login.html" class="btn btn-small">Student Login</a>
+                    <a href="admin-login.html" class="btn btn-small">Admin Login</a>
+                </div>
+                <a href="chat-with-capy.html" class="btn btn-large">Chat with Capy</a>
+            </div>
+        </div>
+
+        <!-- Right Section -->
+        <div class="hero-right">
+            <div class="illustration-capy">
+                <video autoplay muted loop playsinline preload="auto" class="main-illustration-img" id="heroVideo">
+                    <source src="main.mp4" type="video/mp4">
+                    <source src="videos/Mainn.mp4" type="video/mp4">
+                    <source src="videos/main.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <img src="images/main-illustration.png" alt="Capybara at desk with speech bubbles" class="main-illustration-img fallback-image" style="display: none;">
+
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+    <p>
+        <span class="name-tooltip" data-tooltip="1CR23CD033 | 7676801411">Lakshman Pillai</span> | 
+        <span class="name-tooltip" data-tooltip="1CR23CD014 | 8778036377">Barath S</span> | 
+        <span class="name-tooltip" data-tooltip="1CR23CD025 | 6360590460">Jaithra G</span> | 
+        <span class="name-tooltip" data-tooltip="1CR23CD030 | 8296341123">Kethan S</span>
+    </p>
+</footer>
+
+<script src="script.js"></script>
+<script>
+    // Check if user is logged in and show/hide logout link
+    document.addEventListener('DOMContentLoaded', function() {
+        const logoutLink = document.getElementById('logoutLink');
+        if (logoutLink) {
+            if (localStorage.getItem('userToken')) {
+                logoutLink.style.display = 'inline-block';
+                logoutLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    logout();
+                });
+            }
+        }
+    });
+</script>
+</body>
+</html>

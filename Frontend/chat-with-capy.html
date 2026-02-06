@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with Capy - CapyCares</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+        }
+        
+        .typing-indicator span {
+            height: 8px;
+            width: 8px;
+            background: #fe8400;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 2px;
+            animation: typing 1s infinite;
+        }
+        
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo-section">
+            <div class="logo">
+                <!-- Logo placeholder - replace 'images/logo.png' with your logo -->
+                <img src="images/logo.png" alt="CapyCares Logo" class="logo-img">
+            </div>
+            <h1 class="logo-text">Chat with Capy</h1>
+        </div>
+        <nav class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="chat-with-capy.html">Chat with Capy</a>
+            <a href="terms-conditions.html">T&C</a>
+            <a href="interests.html">Interests</a>
+            <a href="#" id="logoutLink" style="display: none;">Logout</a>
+            <button class="dark-mode-toggle" id="darkModeToggle">
+                <i class="fas fa-moon"></i>
+                <span>Dark</span>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="chat-container">
+        <div id="root"></div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        // Check if user is logged in and show/hide logout link
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoutLink = document.getElementById('logoutLink');
+            if (logoutLink) {
+                if (localStorage.getItem('userToken')) {
+                    logoutLink.style.display = 'inline-block';
+                    logoutLink.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        logout();
+                    });
+                }
+            }
+        });
+    </script>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script type="text/babel">
+        const { useState, useRef, useEffect } = React;
+        const socket = io("http://localhost:8080");
+
+        const axios = window.axios;
+        
+        function ChatWithCapy() {
+          const [question, setQuestion] = useState('');
+          const [messages, setMessages] = useState([
+            {
+              id: 1,
+              text: "Hello! I'm Capy, your AI peer support bot. How can I help you today?",
+              isUser: false,
+              timestamp: new Date()
+            }
+          ]);
+          const [isLoading, setIsLoading] = useState(false);
+          const messagesEndRef = useRef(null);
+        
+          const scrollToBottom = () => {
+            messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+          };
+        
+          useEffect(() => {
+            scrollToBottom();
+          }, [messages]);
+          
+          useEffect(() => {
+            socket.on('receive-message', (data) => {
+              setMessages(prev => [
+                ...prev,
+                {
+                  id: Date.now(),
+                  text: data.text,
+                  isUser: false,
+                  timestamp: new Date()
+                }
+              ]);
+              setIsLoading(false);
+            });
+
+            return () => socket.off('receive-message');
+          }, []);
+        
+          // Mental health keywords to detect
+          const mentalHealthKeywords = [
+            'suicidal', 'suicide', 'kill myself', 'end my life', 'want to die',
+            'depressed', 'depression', 'sad', 'hopeless', 'worthless',
+            'anxious', 'anxiety', 'worried', 'nervous', 'panic',
+            'stress', 'stressed', 'overwhelmed', 'burned out',
+            'lonely', 'isolated', 'alone', 'no one cares',
+            'hurt myself', 'self harm', 'cutting'
+          ];
+          
+          // Track repeated keywords
+          const keywordCount = {};
+          
+          // Function to check for mental health keywords
+          const checkMentalHealthKeywords = (message) => {
+            const lowerMessage = message.toLowerCase();
+            let flagged = false;
+            
+            mentalHealthKeywords.forEach(keyword => {
+              if (lowerMessage.includes(keyword)) {
+                flagged = true;
+                keywordCount[keyword] = (keywordCount[keyword] || 0) + 1;
+                
+                // If keyword is repeated more than 3 times, flag for counselor
+                if (keywordCount[keyword] > 3) {
+                  flagForCounselor(keyword, message);
+                }
+              }
+            });
+            
+            return flagged;
+          };
+          
+          // Function to flag messages for counselor
+          const flagForCounselor = async (keyword, message) => {
+            // Send data to the backend
+            try {
+              const response = await fetch('http://localhost:5000/api/flag-message', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  sender: 'Current User',
+                  keyword: keyword,
+                  message: message,
+                  count: keywordCount[keyword]
+                })
+              });
+              
+              const data = await response.json();
+              
+              if (data.success) {
+                // Show notification to user
+                alert(`We've noticed you're mentioning "${keyword}" frequently. A counselor has been notified and may reach out to you.`);
+              }
+            } catch (error) {
+              console.error('Error flagging message:', error);
+              // Fallback to localStorage
+              const flaggedMessages = JSON.parse(localStorage.getItem('flaggedMessages') || '[]');
+              
+              flaggedMessages.push({
+                keyword: keyword,
+                message: message,
+                timestamp: new Date(),
+                count: keywordCount[keyword]
+              });
+              
+              localStorage.setItem('flaggedMessages', JSON.stringify(flaggedMessages));
+              
+              // Show notification to user
+              alert(`We've noticed you're mentioning "${keyword}" frequently. A counselor has been notified and may reach out to you.`);
+            }
+          };
+          
+          const generateAnswer = () => {
+            if (!question.trim() || isLoading) return;
+
+            const userMessage = {
+              id: Date.now(),
+              text: question,
+              isUser: true,
+              timestamp: new Date()
+            };
+
+            setMessages(prev => [...prev, userMessage]);
+            setIsLoading(true);
+
+            socket.emit('send-message', {
+              message: question
+            });
+
+            setQuestion('');
+          };
+
+        
+          const handleKeyPress = (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              generateAnswer();
+            }
+          };
+        
+          const quickMessage = (message) => {
+            setQuestion(message);
+          };
+        
+          return (
+            <>
+              {/* Chat Messages */}
+              <div className="chat-messages">
+                {messages.map((message) => (
+                  <div 
+                    key={message.id} 
+                    className={`message ${message.isUser ? 'user' : ''} ${message.isError ? 'error' : ''}`}
+                  >
+                    <div className="message-avatar"></div>
+                    <div className="message-bubble">
+                      {message.text.split('\n').map((line, i) => (
+                        <span key={i}>
+                          {line}
+                          <br />
+                        </span>
+                      ))}
+                      {message.flagged && (
+                        <div style="color: red; font-size: 12px; margin-top: 5px; font-weight: bold;">⚠️ This message has been flagged for review</div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+                {isLoading && (
+                  <div className="message">
+                    <div className="message-avatar"></div>
+                    <div className="message-bubble">
+                      <div className="typing-indicator">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                <div ref={messagesEndRef} />
+              </div>
+              
+              {/* Chat Input */}
+              <div className="chat-input-container">
+                <div className="chat-input-row">
+                  <input 
+                    type="text" 
+                    className="chat-input" 
+                    placeholder="Type your message..." 
+                    value={question}
+                    onChange={(e) => setQuestion(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    disabled={isLoading}
+                  />
+                  <button 
+                    className="btn" 
+                    style={{ padding: "15px 20px", margin: "0" }}
+                    onClick={generateAnswer}
+                    disabled={isLoading || !question.trim()}
+                  >
+                    <i className="fas fa-paper-plane"></i>
+                  </button>
+                </div>
+                
+                {/* Quick Actions */}
+                <div className="chat-quick-actions">
+                  <button className="quick-action-btn" onClick={() => quickMessage('Need study tips')}>
+                    Need study tips
+                  </button>
+                  <button className="quick-action-btn" onClick={() => quickMessage('Just want to talk')}>
+                    Just want to talk
+                  </button>
+                </div>
+              </div>
+            </>
+          );
+        }
+        
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<ChatWithCapy />);
+    </script>
+    
+
+</body>
+</html>

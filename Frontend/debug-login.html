@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .btn {
+            background-color: #FF7518;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .btn:hover {
+            background-color: #e06710;
+        }
+        .debug-info {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 20px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h2>Debug Admin Login</h2>
+    
+    <div id="debugInfo" class="debug-info">Debug information will appear here...</div>
+    
+    <form id="debugLoginForm">
+        <div class="form-group">
+            <label for="email">Email Address:</label>
+            <input type="email" id="email" class="form-input" placeholder="Email Address" required value="admin@cmrit.ac.in">
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" class="form-input" placeholder="Password" required value="Admin123">
+        </div>
+        
+        <button type="submit" class="btn">Debug Login</button>
+    </form>
+    
+    <br>
+    <button onclick="testWorkingCredentials()" class="btn" style="background-color: #28a745;">Test Working Credentials</button>
+    <button onclick="testCounselor()" class="btn" style="background-color: #007bff;">Test Counselor</button>
+    <button onclick="clearDebug()" class="btn" style="background-color: #6c757d;">Clear Debug</button>
+    
+    <script>
+        // Debug info element
+        const debugInfo = document.getElementById('debugInfo');
+        
+        // Log to debug info
+        function logDebug(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            debugInfo.textContent += `[${timestamp}] ${message}\n`;
+            debugInfo.scrollTop = debugInfo.scrollHeight;
+        }
+        
+        // Clear debug info
+        function clearDebug() {
+            debugInfo.textContent = '';
+        }
+        
+        // Password validation function
+        function isValidPassword(password) {
+            logDebug(`Validating password: "${password}" (length: ${password.length})`);
+            
+            // Check if password is at least 8 characters
+            if (password.length < 8) {
+                logDebug('  → Password too short');
+                return false;
+            }
+            
+            // Check if password contains at least one uppercase letter
+            if (!/[A-Z]/.test(password)) {
+                logDebug('  → No uppercase letter found');
+                return false;
+            }
+            
+            // Check if password contains at least one number
+            if (!/[0-9]/.test(password)) {
+                logDebug('  → No number found');
+                return false;
+            }
+            
+            logDebug('  → Password is valid');
+            return true;
+        }
+        
+        // Perform admin login with debugging
+        async function performAdminLogin(email, password) {
+            logDebug(`Attempting login with:`);
+            logDebug(`  Email: "${email}"`);
+            logDebug(`  Password: "${password}"`);
+            
+            // Show the actual values being sent (with quotes to see whitespace)
+            logDebug(`Sending request with:`);
+            logDebug(`  Email: ${JSON.stringify(email)}`);
+            logDebug(`  Password: ${JSON.stringify(password)}`);
+            
+            try {
+                logDebug('Sending fetch request...');
+                const response = await fetch('http://localhost:5000/api/auth/admin/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                logDebug(`Response status: ${response.status}`);
+                
+                const data = await response.json();
+                logDebug(`Response data: ${JSON.stringify(data, null, 2)}`);
+                
+                if (data.success) {
+                    logDebug('✅ LOGIN SUCCESSFUL!');
+                } else {
+                    logDebug(`❌ LOGIN FAILED: ${data.error || 'Unknown error'}`);
+                }
+            } catch (error) {
+                logDebug(`❌ LOGIN ERROR: ${error.message}`);
+                console.error('Login error:', error);
+            }
+        }
+        
+        // Form submission with debugging
+        document.getElementById('debugLoginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            clearDebug();
+            logDebug('=== LOGIN ATTEMPT ===');
+            
+            const emailInput = document.getElementById('email');
+            const passwordInput = document.getElementById('password');
+            
+            const email = emailInput.value;
+            const password = passwordInput.value;
+            
+            logDebug(`Raw input values:`);
+            logDebug(`  Email: "${email}" (length: ${email.length})`);
+            logDebug(`  Password: "${password}" (length: ${password.length})`);
+            
+            // Trim whitespace
+            const trimmedEmail = email.trim();
+            const trimmedPassword = password.trim();
+            
+            logDebug(`After trimming:`);
+            logDebug(`  Email: "${trimmedEmail}" (length: ${trimmedEmail.length})`);
+            logDebug(`  Password: "${trimmedPassword}" (length: ${trimmedPassword.length})`);
+            
+            // Validate email domain
+            if (!trimmedEmail.endsWith('@cmrit.ac.in')) {
+                logDebug('❌ Email validation failed: does not end with @cmrit.ac.in');
+                return;
+            }
+            
+            // Validate password strength
+            if (!isValidPassword(trimmedPassword)) {
+                logDebug('❌ Password validation failed');
+                return;
+            }
+            
+            // Perform actual admin login
+            performAdminLogin(trimmedEmail, trimmedPassword);
+        });
+        
+        // Test working credentials
+        function testWorkingCredentials() {
+            document.getElementById('email').value = 'admin@cmrit.ac.in';
+            document.getElementById('password').value = 'Admin123';
+            document.getElementById('debugLoginForm').dispatchEvent(new Event('submit'));
+        }
+        
+        // Test counselor credentials
+        function testCounselor() {
+            document.getElementById('email').value = 'priya.counselor@cmrit.ac.in';
+            document.getElementById('password').value = 'Counselor123';
+            document.getElementById('debugLoginForm').dispatchEvent(new Event('submit'));
+        }
+        
+        // Initialize with debug info
+        logDebug('Debug login page initialized');
+        logDebug('Working credentials:');
+        logDebug('  Admin: admin@cmrit.ac.in / Admin123');
+        logDebug('  Counselor: priya.counselor@cmrit.ac.in / Counselor123');
+    </script>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interests - CapyCares</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo-section">
+            <div class="logo">
+                <!-- Logo placeholder - replace 'images/logo.png' with your logo -->
+                <img src="images/logo.png" alt="CapyCares Logo" class="logo-img">
+            </div>
+            <h1 class="logo-text">Interests</h1>
+        </div>
+        <nav class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="chat-with-capy.html">Chat with Capy</a>
+            <a href="terms-conditions.html">T&C</a>
+            <a href="interests.html">Interests</a>
+            <a href="#" id="logoutLink" style="display: none;">Logout</a>
+            <button class="dark-mode-toggle" id="darkModeToggle">
+                <i class="fas fa-moon"></i>
+                <span>Dark</span>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="interests-container">
+        <h2 class="interests-title">Discover Your Community</h2>
+        
+        <!-- Interests Grid -->
+        <div class="interests-grid">
+            <div class="interest-card" data-club-id="dance-lab">
+                <div class="interest-icon"></div>
+                <div class="interest-illustration dance">
+                    <img src="images/dance.png" alt="Dance Activity">
+                </div>
+                <div class="interest-title">Dance Lab</div>
+                <div class="interest-subtitle">Connect & Share</div>
+            </div>
+            
+            <div class="interest-card" data-club-id="coding-den">
+                <div class="interest-icon"></div>
+                <div class="interest-illustration coding">
+                    <img src="images/coding.png" alt="Coding Activity">
+                </div>
+                <div class="interest-title">Coding Den</div>
+                <div class="interest-subtitle">Connect & Share</div>
+            </div>
+            
+            <div class="interest-card" data-club-id="hackathon-hub">
+                <div class="interest-icon"></div>
+                <div class="interest-illustration hackathon">
+                    <img src="images/hackathon.png" alt="Hackathon Activity">
+                </div>
+                <div class="interest-title">Hackathon Hub</div>
+                <div class="interest-subtitle">Connect & Share</div>
+            </div>
+            
+            <div class="interest-card" data-club-id="capy-carer">
+                <div class="interest-icon"></div>
+                <div class="interest-illustration">
+                    <img src="images/study.png" alt="Study Activity">
+                </div>
+                <div class="interest-title">For CapyCarer</div>
+                <div class="interest-subtitle">Connect & Share</div>
+            </div>
+            
+            <div class="interest-card" data-club-id="creative-corner">
+                <div class="interest-icon"></div>
+                <div class="interest-illustration creative">
+                    <img src="images/Creative.png" alt="Creative Activity">
+                </div>
+                <div class="interest-title">Creative Corner</div>
+                <div class="interest-subtitle">Connect & Share</div>
+            </div>
+            
+            <div class="interest-card" data-club-id="gaming-guild">
+                <div class="interest-icon"></div>
+                <div class="interest-illustration gaming">
+                    <img src="images/games.png" alt="Gaming Activity">
+                </div>
+                <div class="interest-title">Gaming Guild</div>
+                <div class="interest-subtitle">Connect & Share</div>
+            </div>
+            
+            <div class="interest-card" data-club-id="book-club">
+                <div class="interest-icon"></div>
+                <div class="interest-illustration books">
+                    <img src="images/books.png" alt="Books Activity">
+                </div>
+                <div class="interest-title">Book Club</div>
+                <div class="interest-subtitle">Connect & Share</div>
+            </div>
+            
+            <div class="interest-card" data-club-id="music-makers">
+                <div class="interest-icon"></div>
+                <div class="interest-illustration music">
+                    <img src="images/music.png" alt="Music Activity">
+                </div>
+                <div class="interest-title">Music Makers</div>
+                <div class="interest-subtitle">Connect & Share</div>
+            </div>
+            
+            <div class="interest-card" data-club-id="fitness-friends">
+                <div class="interest-icon"></div>
+                <div class="interest-illustration fitness">
+                    <img src="images/gym.png" alt="Fitness Activity">
+                </div>
+                <div class="interest-title">Fitness Friends</div>
+                <div class="interest-subtitle">Connect & Share</div>
+            </div>
+            
+            <div class="interest-card" data-club-id="cooking-club">
+                <div class="interest-icon"></div>
+                <div class="interest-illustration cooking">
+                    <img src="images/cook.png" alt="Cooking Activity">
+                </div>
+                <div class="interest-title">Cooking Club</div>
+                <div class="interest-subtitle">Connect & Share</div>
+            </div>
+        </div>
+        
+        <!-- Actions -->
+        <div class="interests-actions">
+            <button class="btn">Suggest an Interest</button>
+            <br><br>
+            <a href="index.html" style="color: #FF7518; font-weight: 600; text-decoration: none;">Back to Home</a>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        // Check if user is logged in and show/hide logout link
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoutLink = document.getElementById('logoutLink');
+            if (logoutLink) {
+                if (localStorage.getItem('userToken')) {
+                    logoutLink.style.display = 'inline-block';
+                    logoutLink.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        logout();
+                    });
+                }
+            }
+        });
+    </script>
+</body>
+</html>

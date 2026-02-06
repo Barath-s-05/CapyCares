@@ -1,0 +1,35 @@
+[
+  {
+    "title": "Managing Academic Stress",
+    "description": "Effective techniques to handle academic pressure and maintain mental well-being",
+    "category": "wellness",
+    "type": "article",
+    "content": "Academic stress is common among college students...",
+    "author": "Dr. Priya Sharma",
+    "tags": ["stress", "academic", "wellness"],
+    "difficulty": "beginner",
+    "isFeatured": true
+  },
+  {
+    "title": "Mindfulness Meditation Guide",
+    "description": "A step-by-step guide to practicing mindfulness meditation",
+    "category": "mental_health",
+    "type": "exercise",
+    "content": "Find a quiet space and sit comfortably...",
+    "author": "Wellness Team",
+    "tags": ["meditation", "mindfulness", "relaxation"],
+    "duration": 10,
+    "difficulty": "beginner",
+    "isFeatured": true
+  },
+  {
+    "title": "Time Management for Students",
+    "description": "Strategies to effectively manage your time and increase productivity",
+    "category": "study_tips",
+    "type": "article",
+    "content": "Effective time management is crucial for academic success...",
+    "author": "Academic Support Team",
+    "tags": ["time management", "productivity", "study tips"],
+    "difficulty": "intermediate"
+  }
+]

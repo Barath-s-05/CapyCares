@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Chat - CapyCares</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Community Chat Styles */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 120px);
+            max-width: 1200px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .chat-header {
+            background: #fe8400;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .chat-header-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .chat-header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .online-members {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+        
+        .chat-header-actions .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #fff;
+            min-width: 160px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            z-index: 1;
+            top: 100%;
+            margin-top: 5px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .dropdown-content a {
+            color: #333;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            font-size: 14px;
+        }
+        
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+            border-radius: 4px;
+            margin: 0 4px;
+        }
+        
+
+        
+        .chat-header-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+        
+        .chat-header-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+        
+        .message {
+            display: flex;
+            margin-bottom: 20px;
+            max-width: 80%;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message.own {
+            margin-left: auto;
+            flex-direction: row-reverse;
+        }
+        
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #fe8400;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .message.own .message-avatar {
+            margin-left: 15px;
+            margin-right: 0;
+        }
+        
+        .message.own .message-content {
+            background: #fe8400;
+            color: white;
+            text-align: right;
+        }
+        
+        .message-content {
+            background: white;
+            border-radius: 18px;
+            padding: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .message.own .message-content {
+            background: #fe8400;
+            color: white;
+        }
+        
+        .message-sender {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .message.own .message-sender {
+            color: rgba(255,255,255,0.9);
+        }
+        
+        .message-text {
+            font-size: 15px;
+            line-height: 1.4;
+        }
+        
+        .message-time {
+            font-size: 12px;
+            color: #888;
+            margin-top: 8px;
+            text-align: right;
+        }
+        
+        .message.own .message-time {
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            padding: 5px 0;
+        }
+        
+        .typing-indicator span {
+            height: 8px;
+            width: 8px;
+            background: #888;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 2px;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+        
+        .message.own .typing-indicator span {
+            background: rgba(255,255,255,0.8);
+        }
+        
+        .typing-indicator span:nth-child(1) {
+            animation-delay: 0s;
+        }
+        
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+        
+        .chat-input-container {
+            padding: 15px;
+            background: white;
+            border-top: 1px solid #eee;
+            flex-shrink: 0;
+        }
+        
+        .chat-input-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+
+        
+        .chat-input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #eee;
+            border-radius: 30px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s ease;
+            min-height: 50px;
+        }
+        
+        .chat-input:focus {
+            border-color: #fe8400;
+        }
+        
+        .send-btn {
+            background: #fe8400;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: background 0.3s ease;
+            flex-shrink: 0;
+        }
+        
+        .send-btn:hover {
+            background: #e07600;
+        }
+        
+        .join-club-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 20px auto;
+            display: block;
+            transition: background 0.3s ease;
+        }
+        
+        .join-club-btn:hover {
+            background: #45a049;
+        }
+        
+        .system-message {
+            text-align: center;
+            padding: 10px;
+            color: #666;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+        
+        /* Members Modal Styles */
+        .members-modal {
+            display: block;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .members-modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .members-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            background: #fe8400;
+            color: white;
+            border-radius: 15px 15px 0 0;
+        }
+        
+        .members-modal-header h3 {
+            margin: 0;
+            font-weight: 600;
+        }
+        
+        .close-modal {
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: white;
+        }
+        
+        .close-modal:hover {
+            opacity: 0.8;
+        }
+        
+        .members-list {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        
+        .member-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .member-item:last-child {
+            border-bottom: none;
+        }
+        
+        .member-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #fe8400;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            margin-right: 15px;
+        }
+        
+        .member-info {
+            flex: 1;
+        }
+        
+        .member-name {
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 3px;
+        }
+        
+        .member-role {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .member-status {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+        
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-indicator.online {
+            background: #4CAF50;
+        }
+        
+        .status-indicator.offline {
+            background: #999;
+        }
+        
+        .member-item.online {
+            background-color: rgba(76, 175, 80, 0.05);
+        }
+        
+        @media (max-width: 768px) {
+            .chat-container {
+                height: calc(100vh - 80px);
+                margin: 10px;
+                border-radius: 10px;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
+            
+            .chat-header-title {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo-section">
+            <div class="logo">
+                <img src="images/logo.png" alt="CapyCares Logo" class="logo-img">
+            </div>
+            <h1 class="logo-text">CapyCares</h1>
+        </div>
+        <nav class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="chat-with-capy.html">Chat with Capy</a>
+            <a href="terms-conditions.html">T&C</a>
+            <a href="interests.html">Interests</a>
+            <a href="student-dashboard.html">Dashboard</a>
+            <a href="#" id="logoutLink" style="display: none;">Logout</a>
+            <button class="dark-mode-toggle" id="darkModeToggle">
+                <i class="fas fa-moon"></i>
+                <span>Dark</span>
+            </button>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="chat-header-title" id="clubName">Community Chat</div>
+                <div class="chat-header-actions">
+                    <div class="online-members" id="onlineMembers">0 online</div>
+                    <div class="dropdown">
+                        <button class="chat-header-btn">☰</button>
+                        <div class="dropdown-content">
+                            <a href="#" id="membersBtn">Members</a>
+                            <a href="#" id="filesBtn">Files</a>
+                            <a href="#" id="eventsBtn">Events</a>
+                            <a href="#" id="settingsBtn">Settings</a>
+                            <a href="#" id="notificationsBtn">Notifications</a>
+                            <a href="#" id="leaveClubBtn">Leave Club</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <div class="system-message">Welcome to the community chat! Be respectful and kind to all members.</div>
+                <!-- Messages will be dynamically added here -->
+            </div>
+            
+            <div class="chat-input-container">
+                <div class="chat-input-row">
+                    <input type="text" class="chat-input" id="messageInput" placeholder="Type a message..." maxlength="500">
+                    <button class="send-btn" id="sendBtn">➤</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        // Check if user is logged in and show/hide logout link
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoutLink = document.getElementById('logoutLink');
+            if (logoutLink) {
+                if (localStorage.getItem('userToken')) {
+                    logoutLink.style.display = 'inline-block';
+                    logoutLink.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        logout();
+                    });
+                }
+            }
+        });
+    </script>
+    <script>
+        // Abusive words filter
+        const abusiveWords = [
+            'stupid', 'idiot', 'dumb', 'moron', 'hate', 'kill', 'die', 
+            'crap', 'damn', 'hell', 'ass', 'bitch', 'bastard', 'shit',
+            // Add more words as needed
+        ];
+        
+        // Mental health keywords to detect
+        const mentalHealthKeywords = [
+            'suicidal', 'suicide', 'kill myself', 'end my life', 'want to die',
+            'depressed', 'depression', 'sad', 'hopeless', 'worthless',
+            'anxious', 'anxiety', 'worried', 'nervous', 'panic',
+            'stress', 'stressed', 'overwhelmed', 'burned out',
+            'lonely', 'isolated', 'alone', 'no one cares',
+            'hurt myself', 'self harm', 'cutting'
+        ];
+        
+        // Track repeated keywords per user
+        const userKeywordCount = {};
+        
+        function filterAbusiveContent(message) {
+            let filteredMessage = message;
+            let hasAbusiveContent = false;
+            
+            abusiveWords.forEach(word => {
+                const regex = new RegExp('\\b' + word + '\\b', 'gi');
+                if (regex.test(filteredMessage)) {
+                    hasAbusiveContent = true;
+                    filteredMessage = filteredMessage.replace(regex, '[message removed due to violation]');
+                }
+            });
+            
+            return {
+                filteredMessage: filteredMessage,
+                isAbusive: hasAbusiveContent
+            };
+        }
+        
+        // Function to check for mental health keywords
+        function checkMentalHealthKeywords(message, sender) {
+            const lowerMessage = message.toLowerCase();
+            let flagged = false;
+            
+            // Initialize user's keyword count if not exists
+            if (!userKeywordCount[sender]) {
+                userKeywordCount[sender] = {};
+            }
+            
+            mentalHealthKeywords.forEach(keyword => {
+                if (lowerMessage.includes(keyword)) {
+                    flagged = true;
+                    userKeywordCount[sender][keyword] = (userKeywordCount[sender][keyword] || 0) + 1;
+                    
+                    // If keyword is repeated more than 3 times, flag for counselor
+                    if (userKeywordCount[sender][keyword] > 3) {
+                        flagForCounselor(sender, keyword, message);
+                    }
+                }
+            });
+            
+            return flagged;
+        }
+        
+        // Function to flag messages for counselor
+        function flagForCounselor(sender, keyword, message) {
+            // Send data to the backend
+            fetch('http://localhost:5000/api/flag-message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    sender: sender,
+                    keyword: keyword,
+                    message: message,
+                    count: userKeywordCount[sender][keyword]
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show notification in chat
+                    const chatMessages = document.getElementById('chatMessages');
+                    const notificationDiv = document.createElement('div');
+                    notificationDiv.className = 'system-message';
+                    notificationDiv.innerHTML = `<strong>⚠️ Notification:</strong> A counselor has been notified about repeated mentions of "${keyword}" by ${sender}.`;
+                    chatMessages.appendChild(notificationDiv);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+            })
+            .catch(error => {
+                console.error('Error flagging message:', error);
+                // Fallback to localStorage
+                const flaggedMessages = JSON.parse(localStorage.getItem('communityFlaggedMessages') || '[]');
+                
+                flaggedMessages.push({
+                    sender: sender,
+                    keyword: keyword,
+                    message: message,
+                    timestamp: new Date(),
+                    count: userKeywordCount[sender][keyword]
+                });
+                
+                localStorage.setItem('communityFlaggedMessages', JSON.stringify(flaggedMessages));
+                
+                // Show notification in chat
+                const chatMessages = document.getElementById('chatMessages');
+                const notificationDiv = document.createElement('div');
+                notificationDiv.className = 'system-message';
+                notificationDiv.innerHTML = `<strong>⚠️ Notification:</strong> A counselor has been notified about repeated mentions of "${keyword}" by ${sender}.`;
+                chatMessages.appendChild(notificationDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            });
+        }
+        
+        // Get club ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const clubId = urlParams.get('clubId');
+        const clubNames = {
+            'dance-lab': 'Dance Lab',
+            'coding-den': 'Coding Den',
+            'hackathon-hub': 'Hackathon Hub',
+            'capy-carer': 'For CapyCarer',
+            'creative-corner': 'Creative Corner',
+            'gaming-guild': 'Gaming Guild',
+            'book-club': 'Book Club',
+            'music-makers': 'Music Makers',
+            'fitness-friends': 'Fitness Friends',
+            'cooking-club': 'Cooking Club'
+        };
+        
+        // Set club name in header
+        const clubName = clubNames[clubId] || 'Community Chat';
+        document.getElementById('clubName').textContent = clubName;
+        
+        // Add to joined clubs if not already joined
+        if (clubId) {
+            addJoinedClub(clubId, clubName);
+        }
+        
+        // Function to add a club to joined clubs (called when joining from interests page)
+        function addJoinedClub(clubId, clubName) {
+            const joinedClubs = JSON.parse(localStorage.getItem('joinedClubs') || '[]');
+            
+            // Check if already joined
+            const alreadyJoined = joinedClubs.some(club => club.id === clubId);
+            if (alreadyJoined) return;
+            
+            // Add new club
+            joinedClubs.push({
+                id: clubId,
+                name: clubName,
+                members: Math.floor(Math.random() * 50) + 10 // Random member count for demo
+            });
+            
+            // Save to localStorage
+            localStorage.setItem('joinedClubs', JSON.stringify(joinedClubs));
+        }
+        
+        // Simulate WebSocket connection
+        function simulateWebSocket() {
+            // In a real implementation, this would be replaced with actual WebSocket code
+            // For now, we'll simulate messages being received
+            
+            // Simulate online members
+            let onlineMembers = Math.floor(Math.random() * 15) + 5; // 5-20 members
+            document.getElementById('onlineMembers').textContent = `${onlineMembers} online`;
+            
+            // Update online members periodically
+            setInterval(() => {
+                onlineMembers = Math.floor(Math.random() * 15) + 5;
+                document.getElementById('onlineMembers').textContent = `${onlineMembers} online`;
+            }, 30000); // Every 30 seconds
+            
+            // Simulate receiving messages
+            setInterval(() => {
+                if (Math.random() > 0.7) { // 30% chance of receiving a message
+                    const senders = ['Alex Johnson', 'Sam Smith', 'Taylor Brown', 'Jordan Lee', 'Casey Davis'];
+                    const messages = [
+                        'Hey everyone! How is everyone doing today?',
+                        'This club is awesome! Great to be part of this community.',
+                        'Has anyone tried the new tutorial?',
+                        'Looking forward to the upcoming event!',
+                        'Thanks for the helpful tips!',
+                        'Can someone help me with this problem?',
+                        'Great discussion everyone!',
+                        'I just joined this club and I love it!',
+                        'Check out this cool resource I found: https://example.com',
+                        'Don\'t forget about the meeting tomorrow!',
+                        'Who\'s ready for the hackathon?',
+                        'Just finished my project! So excited to share it with you all.',
+                        'Anyone else struggling with the assignment?',
+                        'I found a great tutorial on this topic, want me to share?',
+                        'Happy Friday everyone! Hope you all have a great weekend planned.'
+                    ];
+                    
+                    const randomSender = senders[Math.floor(Math.random() * senders.length)];
+                    const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+                    
+                    // Add message to chat
+                    addMessageToChat(randomSender, randomMessage, false);
+                }
+            }, 5000 + Math.random() * 10000); // Every 5-15 seconds
+        }
+        
+        // Add message to chat display
+        function addMessageToChat(sender, message, isOwnMessage) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isOwnMessage ? 'own' : ''}`;
+            
+            // Get first letter of sender's name for avatar
+            const avatarLetter = sender.charAt(0).toUpperCase();
+            
+            // Check if message is flagged
+            const isFlagged = checkMentalHealthKeywords(message, sender);
+            
+            messageDiv.innerHTML = `
+                <div class="message-avatar">${avatarLetter}</div>
+                <div class="message-content">
+                    <div class="message-sender">${sender}</div>
+                    <div class="message-text">${message}</div>
+                    ${isFlagged ? '<div style="color: red; font-size: 12px; margin-top: 5px; font-weight: bold;">⚠️ This message has been flagged for review</div>' : ''}
+                    <div class="message-time">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                </div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Add typing indicator effect
+            if (!isOwnMessage && Math.random() > 0.7) {
+                showTypingIndicator(sender);
+            }
+        }
+        
+        // Show typing indicator
+        function showTypingIndicator(sender) {
+            const chatMessages = document.getElementById('chatMessages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message';
+            typingDiv.id = 'typingIndicator';
+            
+            // Get first letter of sender's name for avatar
+            const avatarLetter = sender.charAt(0).toUpperCase();
+            
+            typingDiv.innerHTML = `
+                <div class="message-avatar">${avatarLetter}</div>
+                <div class="message-content">
+                    <div class="message-sender">${sender}</div>
+                    <div class="typing-indicator">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            `;
+            
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Remove typing indicator after random time
+            setTimeout(() => {
+                if (document.getElementById('typingIndicator')) {
+                    document.getElementById('typingIndicator').remove();
+                }
+            }, 2000 + Math.random() * 3000);
+        }
+        
+        // Show members list
+        function showMembersList() {
+            // In a real implementation, this would fetch members from the backend
+            // For now, we'll show a sample list
+            const members = [
+                { name: 'Alex Johnson', role: 'Admin', online: true },
+                { name: 'Sam Smith', role: 'Member', online: true },
+                { name: 'Taylor Brown', role: 'Member', online: false },
+                { name: 'Jordan Lee', role: 'Moderator', online: true },
+                { name: 'Casey Davis', role: 'Member', online: false },
+                { name: 'Morgan Wilson', role: 'Member', online: true },
+                { name: 'Riley Miller', role: 'Member', online: false }
+            ];
+            
+            // Create modal container
+            const modal = document.createElement('div');
+            modal.className = 'members-modal';
+            modal.innerHTML = `
+                <div class="members-modal-content">
+                    <div class="members-modal-header">
+                        <h3>Community Members</h3>
+                        <span class="close-modal">&times;</span>
+                    </div>
+                    <div class="members-list">
+                        ${members.map(member => `
+                            <div class="member-item ${member.online ? 'online' : 'offline'}">
+                                <div class="member-avatar">${member.name.charAt(0)}</div>
+                                <div class="member-info">
+                                    <div class="member-name">${member.name}</div>
+                                    <div class="member-role">${member.role}</div>
+                                </div>
+                                <div class="member-status">
+                                    <span class="status-indicator ${member.online ? 'online' : 'offline'}"></span>
+                                    <span>${member.online ? 'Online' : 'Offline'}</span>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Add event listener to close button
+            modal.querySelector('.close-modal').addEventListener('click', function() {
+                document.body.removeChild(modal);
+            });
+            
+            // Close modal when clicking outside
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    document.body.removeChild(modal);
+                }
+            });
+        }
+        
+        // Send message function
+        function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            
+            if (message) {
+                // Filter abusive content
+                const filterResult = filterAbusiveContent(message);
+                
+                if (filterResult.isAbusive) {
+                    // Show warning to user
+                    alert('Your message contains inappropriate content and has been blocked.');
+                } else {
+                    // Check for mental health keywords
+                    const isFlagged = checkMentalHealthKeywords(message, 'You');
+                    
+                    // Add own message to chat
+                    addMessageToChat('You', message, true);
+                    
+                    // Clear input
+                    messageInput.value = '';
+                    
+                    // In a real implementation, this would send the message via WebSocket
+                    console.log('Message sent:', message);
+                }
+            }
+        }
+        
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            const messageInput = document.getElementById('messageInput');
+            const sendBtn = document.getElementById('sendBtn');
+            const leaveClubBtn = document.getElementById('leaveClubBtn');
+            const membersBtn = document.getElementById('membersBtn');
+            const filesBtn = document.getElementById('filesBtn');
+            const eventsBtn = document.getElementById('eventsBtn');
+            const settingsBtn = document.getElementById('settingsBtn');
+            const notificationsBtn = document.getElementById('notificationsBtn');
+            const dropdown = document.querySelector('.dropdown');
+            const dropdownContent = document.querySelector('.dropdown-content');
+            
+            // Show dropdown on click and hide when clicking elsewhere
+            if (dropdown && dropdownContent) {
+                dropdown.addEventListener('click', function(e) {
+                    e.stopPropagation(); // Prevent click from bubbling to document
+                    dropdownContent.style.display = 'block';
+                    dropdownContent.style.opacity = '1';
+                });
+                
+                // Hide dropdown when clicking anywhere else
+                document.addEventListener('click', function() {
+                    dropdownContent.style.opacity = '0';
+                    setTimeout(function() {
+                        dropdownContent.style.display = 'none';
+                    }, 300);
+                });
+                
+                // Prevent dropdown from closing when clicking inside it
+                dropdownContent.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            }
+            
+            // Send message on button click
+            sendBtn.addEventListener('click', sendMessage);
+            
+            // Send message on Enter key (but not Shift+Enter for new line)
+            messageInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+            
+            // Members button
+            if (membersBtn) {
+                membersBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation(); // Prevent click from bubbling to document
+                    showMembersList();
+                });
+            }
+            
+            // Files button
+            if (filesBtn) {
+                filesBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    alert('Shared files would be displayed here in a full implementation.');
+                });
+            }
+            
+            // Events button
+            if (eventsBtn) {
+                eventsBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    alert('Upcoming events would be displayed here in a full implementation.');
+                });
+            }
+            
+            // Settings button
+            if (settingsBtn) {
+                settingsBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    alert('Club settings would be displayed here in a full implementation.');
+                });
+            }
+            
+            // Notifications button
+            if (notificationsBtn) {
+                notificationsBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    alert('Notification settings would be displayed here in a full implementation.');
+                });
+            }
+            
+            // Leave club button
+            if (leaveClubBtn) {
+                leaveClubBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (confirm('Are you sure you want to leave this club?')) {
+                        // In a real implementation, this would make an API call to leave the club
+                        alert('You have left the club. Redirecting to interests page...');
+                        window.location.href = 'interests.html';
+                    }
+                });
+            }
+            
+            // Simulate WebSocket connection
+            simulateWebSocket();
+            
+            // Add some initial messages
+            setTimeout(() => {
+                addMessageToChat('CapyBot', 'Welcome to ' + clubName + '! Please be respectful and kind to all members.', false);
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

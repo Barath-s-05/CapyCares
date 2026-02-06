@@ -1,0 +1,32 @@
+[
+  {
+    "_id": "64a0f1e7d9c1a2b3c4d5e701",
+    "name": "AI & Machine Learning Club",
+    "description": "Exploring the frontiers of artificial intelligence and machine learning",
+    "category": "technical",
+    "admins": ["64a0f1e7d9c1a2b3c4d5e6f2"],
+    "membersCount": 45,
+    "isPublic": true,
+    "rules": "Be respectful to all members and share knowledge openly"
+  },
+  {
+    "_id": "64a0f1e7d9c1a2b3c4d5e702",
+    "name": "Wellness Warriors",
+    "description": "Promoting mental health and wellness on campus",
+    "category": "social",
+    "admins": ["64a0f1e7d9c1a2b3c4d5e6f2"],
+    "membersCount": 78,
+    "isPublic": true,
+    "rules": "Confidentiality is key. What's shared in the group stays in the group."
+  },
+  {
+    "_id": "64a0f1e7d9c1a2b3c4d5e703",
+    "name": "Dance Society",
+    "description": "Express yourself through dance and rhythm",
+    "category": "cultural",
+    "admins": ["64a0f1e7d9c1a2b3c4d5e6f4"],
+    "membersCount": 32,
+    "isPublic": true,
+    "rules": "Have fun and be creative!"
+  }
+]

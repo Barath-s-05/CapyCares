@@ -1,0 +1,129 @@
+[
+  {
+    "student": "64a0f1e7d9c1a2b3c4d5e6f1",
+    "semester": 5,
+    "subjects": [
+      {
+        "name": "Software Engineering & Project Management",
+        "attendance": 42,
+        "attendancePercentage": 95,
+        "internalMarks": 45,
+        "grade": "A+",
+        "facultyName": "Dr. Anil Kumar"
+      },
+      {
+        "name": "Computer Networks",
+        "attendance": 38,
+        "attendancePercentage": 88,
+        "internalMarks": 40,
+        "grade": "A",
+        "facultyName": "Prof. Sunita"
+      },
+      {
+        "name": "Computer Vision",
+        "attendance": 40,
+        "attendancePercentage": 92,
+        "internalMarks": 42,
+        "grade": "A+",
+        "facultyName": "Dr. Ramesh"
+      },
+      {
+        "name": "Theory of Computation",
+        "attendance": 35,
+        "attendancePercentage": 80,
+        "internalMarks": 38,
+        "grade": "B+",
+        "facultyName": "Prof. Geetha"
+      },
+      {
+        "name": "Research Methodology and IPR",
+        "attendance": 44,
+        "attendancePercentage": 100,
+        "internalMarks": 48,
+        "grade": "O",
+        "facultyName": "Dr. Priya"
+      },
+      {
+        "name": "Environmental Studies and E-Waste Management",
+        "attendance": 40,
+        "attendancePercentage": 92,
+        "internalMarks": 45,
+        "grade": "A",
+        "facultyName": "Prof. Rajesh"
+      },
+      {
+        "name": "TYL Aptitude",
+        "attendance": 30,
+        "attendancePercentage": 75,
+        "internalMarks": 35,
+        "grade": "B+",
+        "facultyName": "Mr. Vinod"
+      },
+      {
+        "name": "TYL Logical Reasoning",
+        "attendance": 32,
+        "attendancePercentage": 82,
+        "internalMarks": 37,
+        "grade": "A",
+        "facultyName": "Ms. Deepa"
+      },
+      {
+        "name": "Data Visualization Lab",
+        "attendance": 20,
+        "attendancePercentage": 100,
+        "internalMarks": 48,
+        "grade": "O",
+        "facultyName": "Dr. Anil Kumar"
+      },
+      {
+        "name": "CN Lab",
+        "attendance": 18,
+        "attendancePercentage": 90,
+        "internalMarks": 45,
+        "grade": "A",
+        "facultyName": "Prof. Sunita"
+      },
+      {
+        "name": "Technical Training (5th Sem)",
+        "attendance": 40,
+        "attendancePercentage": 100,
+        "internalMarks": 47,
+        "grade": "O",
+        "facultyName": "Industry Expert"
+      },
+      {
+        "name": "Mini Project",
+        "attendance": 40,
+        "attendancePercentage": 100,
+        "internalMarks": 48,
+        "grade": "O",
+        "facultyName": "Dr. Anil Kumar"
+      },
+      {
+        "name": "Full Stack Development",
+        "attendance": 38,
+        "attendancePercentage": 95,
+        "internalMarks": 46,
+        "grade": "O",
+        "facultyName": "Mr. Karthik"
+      },
+      {
+        "name": "TYL Soft Skills",
+        "attendance": 25,
+        "attendancePercentage": 85,
+        "internalMarks": 42,
+        "grade": "A+",
+        "facultyName": "Ms. Priya"
+      },
+      {
+        "name": "9LPA Training",
+        "attendance": 40,
+        "attendancePercentage": 100,
+        "internalMarks": 49,
+        "grade": "O",
+        "facultyName": "Mr. Suresh"
+      }
+    ],
+    "sgpa": 9.2
+  }
+]
