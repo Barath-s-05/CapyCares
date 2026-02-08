@@ -1,10 +1,17 @@
+require("dotenv").config();
 const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
 const bcrypt = require('bcryptjs');
 
 const app = express();
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 5000;
+
+const Groq = require("groq-sdk");
+
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY
+});
 
 // Middleware
 app.use(express.json());
@@ -572,6 +579,40 @@ app.post('/api/auth/student/signup', async (req, res) => {
     });
   }
 });
+app.post("/api/chat", async (req, res) => {
+  try {
+    const { message } = req.body;
+
+    if (!message) {
+      return res.status(400).json({ error: "Message required" });
+    }
+
+    const completion = await groq.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      messages: [
+        {
+          role: "system",
+          content: "You are Capy, a warm, empathetic student mental health peer support listener. You are not a doctor. Encourage seeking help if user expresses severe distress."
+
+        },
+        {
+          role: "user",
+          content: message
+        }
+      ]
+    });
+
+    res.json({
+      reply: completion.choices[0].message.content
+    });
+
+  } catch (err) {
+    console.error("Groq Error:", err);
+    res.status(500).json({ error: "Groq failed" });
+  }
+});
+console.log("Groq Key Loaded:", process.env.GROQ_API_KEY ? "YES" : "NO");
+
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
