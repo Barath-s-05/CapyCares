@@ -88,10 +88,8 @@
             }
         });
     </script>
-    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script type="text/babel">
         const { useState, useRef, useEffect } = React;
-        const socket = io("http://localhost:8080");
 
         const axios = window.axios;
         
@@ -116,22 +114,7 @@
             scrollToBottom();
           }, [messages]);
           
-          useEffect(() => {
-            socket.on('receive-message', (data) => {
-              setMessages(prev => [
-                ...prev,
-                {
-                  id: Date.now(),
-                  text: data.text,
-                  isUser: false,
-                  timestamp: new Date()
-                }
-              ]);
-              setIsLoading(false);
-            });
-
-            return () => socket.off('receive-message');
-          }, []);
+          
         
           // Mental health keywords to detect
           const mentalHealthKeywords = [
@@ -208,7 +191,7 @@
             }
           };
           
-          const generateAnswer = () => {
+          const generateAnswer = async () => {
             if (!question.trim() || isLoading) return;
 
             const userMessage = {
@@ -221,12 +204,42 @@
             setMessages(prev => [...prev, userMessage]);
             setIsLoading(true);
 
-            socket.emit('send-message', {
-              message: question
-            });
+            try {
+              const res = await fetch("http://localhost:5000/api/chat", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ message: question })
+              });
 
-            setQuestion('');
+              const data = await res.json();
+
+              const botMessage = {
+                id: Date.now() + 1,
+                text: data.reply,
+                isUser: false,
+                timestamp: new Date()
+              };
+
+              setMessages(prev => [...prev, botMessage]);
+
+            } catch (err) {
+              setMessages(prev => [
+                ...prev,
+                {
+                  id: Date.now(),
+                  text: "Sorry, I'm having trouble responding right now.",
+                  isUser: false,
+                  isError: true
+                }
+              ]);
+            }
+
+            setIsLoading(false);
+            setQuestion("");
           };
+
 
         
           const handleKeyPress = (e) => {
@@ -313,11 +326,12 @@
             </>
           );
         }
+
+    
         
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<ChatWithCapy />);
     </script>
-    
 
 </body>
 </html>

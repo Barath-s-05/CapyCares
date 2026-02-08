@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import './style.css';
-const socket = io('http://localhost:8080');
+
+
 
 
 function ChatWithCapy() {
@@ -28,91 +29,48 @@ function ChatWithCapy() {
   const generateAnswer = async () => {
     if (!question.trim() || isLoading) return;
 
-    // Add user message to chat
     const userMessage = {
       id: Date.now(),
       text: question,
       isUser: true,
       timestamp: new Date()
     };
-    
+
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
-    
-    // Clear input
-    const userQuestion = question;
-    setQuestion('');
 
     try {
-      // In a real implementation, you would call your backend API here
-      // For now, we'll simulate a response from Gemini API
-      
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // This is where you would integrate with the actual Gemini API
-      // For demonstration, we'll use simulated responses based on keywords
-      let responseText = "";
-      
-      if (userQuestion.toLowerCase().includes('study') || userQuestion.toLowerCase().includes('learn')) {
-        responseText = "I'd be happy to help with your studies! Here are some effective study techniques:\n\n" +
-          "1. Pomodoro Technique - Study for 25 minutes, then take a 5-minute break\n" +
-          "2. Active recall - Test yourself instead of just re-reading notes\n" +
-          "3. Spaced repetition - Review material at increasing intervals\n" +
-          "4. Teach someone else - Explaining concepts helps solidify your understanding\n\n" +
-          "Would you like specific advice for any particular subject?";
-      } else if (userQuestion.toLowerCase().includes('stress') || userQuestion.toLowerCase().includes('anxious')) {
-        responseText = "I understand you're feeling stressed, and that's completely normal. Here are some techniques that might help:\n\n" +
-          "1. Deep breathing exercises - Try the 4-7-8 technique\n" +
-          "2. Progressive muscle relaxation\n" +
-          "3. Mindfulness meditation for 5-10 minutes daily\n" +
-          "4. Regular physical activity, even a short walk helps\n\n" +
-          "Remember, it's okay to ask for help from friends, family, or counselors when you need it.";
-      } else if (userQuestion.toLowerCase().includes('sleep')) {
-        responseText = "Good sleep is crucial for your mental and physical health. Here are some tips for better sleep:\n\n" +
-          "1. Maintain a consistent sleep schedule\n" +
-          "2. Avoid screens 1 hour before bedtime\n" +
-          "3. Keep your room cool and dark\n" +
-          "4. Avoid caffeine late in the day\n" +
-          "5. Try relaxation techniques before bed\n\n" +
-          "If sleep problems persist, consider speaking with a healthcare provider.";
-      } else {
-        // Default response
-        const responses = [
-          "I understand you're reaching out. It takes courage to seek support, and I'm here to help. Could you tell me more about what's on your mind?",
-          "Thank you for sharing that with me. It sounds like you're going through a challenging time. What would you like to focus on first?",
-          "I'm listening, and I care about your wellbeing. Sometimes talking through our thoughts and feelings can be really helpful. What's your main concern right now?",
-          "It's completely normal to feel overwhelmed sometimes. Let's work through this together. What's the most pressing issue for you today?"
-        ];
-        responseText = responses[Math.floor(Math.random() * responses.length)];
-      }
-      
-      // Add AI response to chat
-      const aiMessage = {
-        id: Date.now() + 1,
-        text: responseText,
-        isUser: false,
-        timestamp: new Date()
-      };
-      
-      setMessages(prev => [...prev, aiMessage]);
-    } catch (error) {
-      console.error("Error generating response:", error);
-      
-      // Add error message to chat
-      const errorMessage = {
-        id: Date.now() + 1,
-        text: "Sorry, I'm having trouble responding right now. Please try again in a moment.",
-        isUser: false,
-        timestamp: new Date(),
-        isError: true
-      };
-      
-      setMessages(prev => [...prev, errorMessage]);
-    } finally {
-      setIsLoading(false);
+      const res = await fetch("http://localhost:5000/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message: question
+        })
+      });
+
+      const data = await res.json();
+
+      setMessages(prev => [
+        ...prev,
+        {
+          id: Date.now() + 1,
+          text: data.reply,
+          isUser: false,
+          timestamp: new Date()
+        }
+      ]);
+
+    } catch (err) {
+      console.error(err);
     }
+
+    setIsLoading(false);
+    setQuestion("");
   };
+
+
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
