@@ -72,21 +72,78 @@
         <div id="root"></div>
     </main>
 
-    <script src="script.js"></script>
     <script>
-        // Check if user is logged in and show/hide logout link
+        // Check authentication first
         document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is authenticated
+            if (!localStorage.getItem('userToken')) {
+                alert('Please login to access the chat');
+                window.location.href = 'student-login.html';
+                return;
+            }
+            
+            // Initialize chat components
+            initializeChat();
+        });
+        
+        function initializeChat() {
+            // Load chat history
+            loadChatHistory();
+            
+            // Set up logout functionality
             const logoutLink = document.getElementById('logoutLink');
             if (logoutLink) {
-                if (localStorage.getItem('userToken')) {
-                    logoutLink.style.display = 'inline-block';
-                    logoutLink.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        logout();
-                    });
-                }
+                logoutLink.style.display = 'inline-block';
+                logoutLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    logout();
+                });
             }
-        });
+            
+            // Set up clear chat button
+            const clearChatBtn = document.getElementById('clearChatBtn');
+            if (clearChatBtn) {
+                clearChatBtn.addEventListener('click', function() {
+                    if (confirm('Are you sure you want to clear your chat history? This cannot be undone.')) {
+                        localStorage.removeItem('chatHistory');
+                        window.location.reload();
+                    }
+                });
+            }
+        }
+        
+        function loadChatHistory() {
+            // Load chat history from localStorage
+            const chatHistory = JSON.parse(localStorage.getItem('chatHistory') || '[]');
+            
+            // If there's history, update the initial messages
+            if (chatHistory.length > 0) {
+                // Update the initial state in the React component
+                window.initialChatHistory = chatHistory;
+            }
+        }
+        
+        function saveChatMessage(message) {
+            // Load existing chat history
+            const chatHistory = JSON.parse(localStorage.getItem('chatHistory') || '[]');
+            
+            // Add new message with timestamp
+            chatHistory.push({
+                id: Date.now(),
+                text: message.text,
+                isUser: message.isUser,
+                timestamp: new Date().toISOString(),
+                flagged: message.flagged || false
+            });
+            
+            // Keep only last 50 messages to prevent localStorage overflow
+            if (chatHistory.length > 50) {
+                chatHistory.splice(0, chatHistory.length - 50);
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+        }
     </script>
     <script type="text/babel">
         const { useState, useRef, useEffect } = React;
@@ -94,15 +151,18 @@
         const axios = window.axios;
         
         function ChatWithCapy() {
-          const [question, setQuestion] = useState('');
-          const [messages, setMessages] = useState([
+          // Initialize with chat history if available
+          const initialMessages = window.initialChatHistory || [
             {
               id: 1,
               text: "Hello! I'm Capy, your AI peer support bot. How can I help you today?",
               isUser: false,
-              timestamp: new Date()
+              timestamp: new Date().toISOString()
             }
-          ]);
+          ];
+          
+          const [question, setQuestion] = useState('');
+          const [messages, setMessages] = useState(initialMessages);
           const [isLoading, setIsLoading] = useState(false);
           const messagesEndRef = useRef(null);
         
@@ -198,10 +258,12 @@
               id: Date.now(),
               text: question,
               isUser: true,
-              timestamp: new Date()
+              timestamp: new Date().toISOString()
             };
 
             setMessages(prev => [...prev, userMessage]);
+            // Save to persistent storage
+            saveChatMessage(userMessage);
             setIsLoading(true);
 
             try {
@@ -219,21 +281,23 @@
                 id: Date.now() + 1,
                 text: data.reply,
                 isUser: false,
-                timestamp: new Date()
+                timestamp: new Date().toISOString()
               };
 
               setMessages(prev => [...prev, botMessage]);
+              // Save bot response to persistent storage
+              saveChatMessage(botMessage);
 
             } catch (err) {
-              setMessages(prev => [
-                ...prev,
-                {
-                  id: Date.now(),
-                  text: "Sorry, I'm having trouble responding right now.",
-                  isUser: false,
-                  isError: true
-                }
-              ]);
+              const errorMessage = {
+                id: Date.now(),
+                text: "Sorry, I'm having trouble responding right now.",
+                isUser: false,
+                isError: true,
+                timestamp: new Date().toISOString()
+              };
+              setMessages(prev => [...prev, errorMessage]);
+              saveChatMessage(errorMessage);
             }
 
             setIsLoading(false);
@@ -271,8 +335,17 @@
                         </span>
                       ))}
                       {message.flagged && (
-                        <div style="color: red; font-size: 12px; margin-top: 5px; font-weight: bold;">⚠️ This message has been flagged for review</div>
+                        <div style={{color: 'red', fontSize: '12px', marginTop: '5px', fontWeight: 'bold'}}>⚠️ This message has been flagged for review</div>
                       )}
+                      {/* Timestamp */}
+                      <div style={{fontSize: '11px', color: '#888', marginTop: '5px', textAlign: 'right'}}>
+                        {new Date(message.timestamp).toLocaleString('en-US', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          month: 'short',
+                          day: 'numeric'
+                        })}
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -293,6 +366,11 @@
               
               {/* Chat Input */}
               <div className="chat-input-container">
+                <div style="text-align: center; margin-bottom: 10px;">
+                  <button className="btn" id="clearChatBtn" style="background: #dc3545; padding: 8px 15px; font-size: 12px;">
+                    Clear Chat History
+                  </button>
+                </div>
                 <div className="chat-input-row">
                   <input 
                     type="text" 

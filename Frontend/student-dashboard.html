@@ -271,6 +271,7 @@
         .resource-card:hover {
             background: #e9ecef;
             transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
         
         .resource-icon {
@@ -471,25 +472,35 @@
             <!-- Academic Marks -->
             <div class="dashboard-card">
                 <h3 class="card-title">Academic Performance</h3>
-                <div class="stat-value">87%</div>
+                <div class="stat-value" id="overallAverage">--%</div>
                 <div class="stat-label">Overall Average</div>
+                <div class="wellness-actions" style="margin-top: 15px;">
+                    <button class="btn btn-full-width" id="addSubjectBtn">Add Subject & Marks</button>
+                </div>
                 <div id="marksChart" style="height: 100px; margin-top: 15px;"></div>
             </div>
             
             <!-- Attendance -->
             <div class="dashboard-card">
                 <h3 class="card-title">Attendance</h3>
-                <div id="attendanceDetails"></div>
+                <div id="attendanceDetails">
+                    <div style="text-align: center; padding: 20px; color: #666;">
+                        No attendance data yet. <button class="btn" id="addAttendanceBtn" style="margin-left: 10px;">Add Attendance</button>
+                    </div>
+                </div>
             </div>
             
             <!-- Current Mood -->
             <div class="dashboard-card">
                 <h3 class="card-title">Current Mood</h3>
                 <div class="mood-display">
-                    <div class="mood-emoji">😊</div>
-                    <div class="mood-text">Feeling Positive</div>
+                    <div class="mood-emoji" id="currentMoodEmoji">😐</div>
+                    <div class="mood-text" id="currentMoodText">Not logged yet</div>
                 </div>
-                <div class="stat-label" style="margin-top: 15px;">Last updated: Today, 10:30 AM</div>
+                <div class="stat-label" style="margin-top: 15px;" id="lastMoodUpdate">Last updated: Never</div>
+                <div class="wellness-actions" style="margin-top: 15px;">
+                    <button class="btn btn-full-width" id="updateMoodBtn">Update Mood</button>
+                </div>
             </div>
         </div>
         
@@ -582,7 +593,7 @@
         <div class="dashboard-card">
             <h3 class="card-title">Quick Links</h3>
             <div class="quick-links">
-                <a href="chat-with-capy.html" class="quick-link">
+                <a href="javascript:void(0)" class="quick-link" onclick="navigateToChat()">
                     <div class="link-icon"></div>
                     <div class="link-text">Chat with Capy</div>
                 </a>
@@ -590,19 +601,19 @@
                     <div class="link-icon"></div>
                     <div class="link-text">Clubs</div>
                 </a>
-                <a href="#" class="quick-link">
+                <a href="javascript:void(0)" class="quick-link" onclick="showMoodHistory()">
                     <div class="link-icon"></div>
                     <div class="link-text">Mood Log</div>
                 </a>
-                <a href="#" class="quick-link">
+                <a href="javascript:void(0)" class="quick-link" onclick="showProfile()">
                     <div class="link-icon"></div>
                     <div class="link-text">Profile</div>
                 </a>
-                <a href="#" class="quick-link">
+                <a href="javascript:void(0)" class="quick-link" onclick="showSchedule()">
                     <div class="link-icon"></div>
                     <div class="link-text">Schedule</div>
                 </a>
-                <a href="#" class="quick-link">
+                <a href="javascript:void(0)" class="quick-link" onclick="showResources()">
                     <div class="link-icon"></div>
                     <div class="link-text">Resources</div>
                 </a>
@@ -632,21 +643,547 @@
         </div>
     </main>
 
-    <script src="script.js"></script>
     <script>
-        // Check if user is logged in and show/hide logout link
+        // Check authentication first
         document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is authenticated
+            if (!localStorage.getItem('userToken')) {
+                alert('Please login to access the dashboard');
+                window.location.href = 'student-login.html';
+                return;
+            }
+            
+            // Initialize dashboard components
+            initializeDashboard();
+            
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Check for flagged messages
+            checkFlaggedStatus();
+        });
+        
+        function initializeDashboard() {
+            // Load user data from localStorage or initialize
+            loadUserData();
+            
+            // Initialize all dashboard components
+            initializeAcademicPerformance();
+            initializeAttendance();
+            initializeMoodTracker();
+            initializeWellnessTracker();
+            initializeJoinedClubs();
+        }
+        
+        function setupEventListeners() {
+            // Add Subject button
+            const addSubjectBtn = document.getElementById('addSubjectBtn');
+            if (addSubjectBtn) {
+                addSubjectBtn.addEventListener('click', showAddSubjectModal);
+            }
+            
+            // Add Attendance button
+            const addAttendanceBtn = document.getElementById('addAttendanceBtn');
+            if (addAttendanceBtn) {
+                addAttendanceBtn.addEventListener('click', showAddAttendanceModal);
+            }
+            
+            // Update Mood button
+            const updateMoodBtn = document.getElementById('updateMoodBtn');
+            if (updateMoodBtn) {
+                updateMoodBtn.addEventListener('click', showUpdateMoodModal);
+            }
+            
+            // Logout functionality
             const logoutLink = document.getElementById('logoutLink');
             if (logoutLink) {
-                if (localStorage.getItem('userToken')) {
-                    logoutLink.style.display = 'inline-block';
-                    logoutLink.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        logout();
-                    });
-                }
+                logoutLink.style.display = 'inline-block';
+                logoutLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    logout();
+                });
             }
-        });
+        }
+        
+        // User Data Management
+        function loadUserData() {
+            // Load user-specific data from localStorage
+            window.userData = {
+                subjects: JSON.parse(localStorage.getItem('userSubjects') || '[]'),
+                attendance: JSON.parse(localStorage.getItem('userAttendance') || '[]'),
+                moodHistory: JSON.parse(localStorage.getItem('userMoodHistory') || '[]'),
+                wellnessData: JSON.parse(localStorage.getItem('wellnessData') || '{}')
+            };
+        }
+        
+        function saveUserData() {
+            localStorage.setItem('userSubjects', JSON.stringify(window.userData.subjects));
+            localStorage.setItem('userAttendance', JSON.stringify(window.userData.attendance));
+            localStorage.setItem('userMoodHistory', JSON.stringify(window.userData.moodHistory));
+            localStorage.setItem('wellnessData', JSON.stringify(window.userData.wellnessData));
+        }
+        
+        // Academic Performance Functions
+        function initializeAcademicPerformance() {
+            updateAcademicDisplay();
+            renderMarksChart();
+        }
+        
+        function updateAcademicDisplay() {
+            const overallAverageElement = document.getElementById('overallAverage');
+            if (window.userData.subjects.length > 0) {
+                const total = window.userData.subjects.reduce((sum, subject) => sum + subject.marks, 0);
+                const average = Math.round(total / window.userData.subjects.length);
+                overallAverageElement.textContent = `${average}%`;
+            } else {
+                overallAverageElement.textContent = '--%';
+            }
+        }
+        
+        function showAddSubjectModal() {
+            const modal = createModal('Add Subject & Marks', `
+                <div class="detail-item">
+                    <div class="detail-label">Subject Name</div>
+                    <input type="text" id="subjectName" class="wellness-input" placeholder="Enter subject name">
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Marks (%)</div>
+                    <input type="number" id="subjectMarks" class="wellness-input" min="0" max="100" placeholder="e.g. 85">
+                </div>
+                <button class="btn-full-width" id="saveSubject" style="margin-top: 20px;">Add Subject</button>
+            `);
+            
+            document.body.appendChild(modal);
+            
+            document.getElementById('saveSubject').addEventListener('click', function() {
+                const name = document.getElementById('subjectName').value.trim();
+                const marks = parseInt(document.getElementById('subjectMarks').value);
+                
+                if (name && !isNaN(marks) && marks >= 0 && marks <= 100) {
+                    window.userData.subjects.push({
+                        name: name,
+                        marks: marks,
+                        id: Date.now()
+                    });
+                    saveUserData();
+                    updateAcademicDisplay();
+                    renderMarksChart();
+                    document.body.removeChild(modal);
+                    showMessage('Subject added successfully!', 'success');
+                } else {
+                    showMessage('Please enter valid subject name and marks (0-100)', 'error');
+                }
+            });
+        }
+        
+        // Attendance Functions
+        function initializeAttendance() {
+            updateAttendanceDisplay();
+        }
+        
+        function updateAttendanceDisplay() {
+            const attendanceContainer = document.getElementById('attendanceDetails');
+            if (window.userData.attendance.length > 0) {
+                let html = '<div style="max-height: 200px; overflow-y: auto;">';
+                window.userData.attendance.forEach(item => {
+                    const displayName = item.subject.length > 25 ? item.subject.substring(0, 25) + '...' : item.subject;
+                    html += `
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0f0f0;">
+                            <div style="font-size: 14px;">${displayName}</div>
+                            <div style="font-weight: 600; color: ${item.percentage >= 85 ? '#4CAF50' : item.percentage >= 75 ? '#FFC107' : '#F44336'};">${item.percentage}%</div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                attendanceContainer.innerHTML = html;
+            } else {
+                attendanceContainer.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: #666;">
+                        No attendance data yet. <button class="btn" id="addAttendanceBtnModal" style="margin-left: 10px;">Add Attendance</button>
+                    </div>
+                `;
+                document.getElementById('addAttendanceBtnModal').addEventListener('click', showAddAttendanceModal);
+            }
+        }
+        
+        function showAddAttendanceModal() {
+            const modal = createModal('Add Attendance', `
+                <div class="detail-item">
+                    <div class="detail-label">Subject Name</div>
+                    <input type="text" id="attendanceSubject" class="wellness-input" placeholder="Enter subject name">
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Attendance (%)</div>
+                    <input type="number" id="attendancePercentage" class="wellness-input" min="0" max="100" placeholder="e.g. 90">
+                </div>
+                <button class="btn-full-width" id="saveAttendance" style="margin-top: 20px;">Add Attendance</button>
+            `);
+            
+            document.body.appendChild(modal);
+            
+            document.getElementById('saveAttendance').addEventListener('click', function() {
+                const subject = document.getElementById('attendanceSubject').value.trim();
+                const percentage = parseInt(document.getElementById('attendancePercentage').value);
+                
+                if (subject && !isNaN(percentage) && percentage >= 0 && percentage <= 100) {
+                    window.userData.attendance.push({
+                        subject: subject,
+                        percentage: percentage,
+                        id: Date.now()
+                    });
+                    saveUserData();
+                    updateAttendanceDisplay();
+                    document.body.removeChild(modal);
+                    showMessage('Attendance added successfully!', 'success');
+                } else {
+                    showMessage('Please enter valid subject name and percentage (0-100)', 'error');
+                }
+            });
+        }
+        
+        // Mood Tracker Functions
+        function initializeMoodTracker() {
+            updateMoodDisplay();
+        }
+        
+        function updateMoodDisplay() {
+            const moodEmoji = document.getElementById('currentMoodEmoji');
+            const moodText = document.getElementById('currentMoodText');
+            const lastUpdate = document.getElementById('lastMoodUpdate');
+            
+            if (window.userData.moodHistory.length > 0) {
+                const latestMood = window.userData.moodHistory[window.userData.moodHistory.length - 1];
+                const moodMap = {
+                    1: { emoji: '😢', text: 'Very Sad' },
+                    2: { emoji: '😞', text: 'Sad' },
+                    3: { emoji: '😐', text: 'Neutral' },
+                    4: { emoji: '🙂', text: 'Happy' },
+                    5: { emoji: '😊', text: 'Very Happy' }
+                };
+                
+                const moodData = moodMap[latestMood.rating] || moodMap[3];
+                moodEmoji.textContent = moodData.emoji;
+                moodText.textContent = moodData.text;
+                lastUpdate.textContent = `Last updated: ${formatDateTime(latestMood.timestamp)}`;
+            }
+        }
+        
+        function showUpdateMoodModal() {
+            const modal = createModal('Update Mood', `
+                <div class="detail-item">
+                    <div class="detail-label">How are you feeling today?</div>
+                    <select id="moodRating" class="wellness-input">
+                        <option value="1">😢 Very Sad (1)</option>
+                        <option value="2">😞 Sad (2)</option>
+                        <option value="3">😐 Neutral (3)</option>
+                        <option value="4">🙂 Happy (4)</option>
+                        <option value="5">😊 Very Happy (5)</option>
+                    </select>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Any notes? (Optional)</div>
+                    <textarea id="moodNotes" class="wellness-input" placeholder="What's on your mind?" style="height: 80px; resize: vertical;"></textarea>
+                </div>
+                <button class="btn-full-width" id="saveMood" style="margin-top: 20px;">Save Mood</button>
+            `);
+            
+            document.body.appendChild(modal);
+            
+            document.getElementById('saveMood').addEventListener('click', function() {
+                const rating = parseInt(document.getElementById('moodRating').value);
+                const notes = document.getElementById('moodNotes').value.trim();
+                
+                if (!isNaN(rating) && rating >= 1 && rating <= 5) {
+                    window.userData.moodHistory.push({
+                        rating: rating,
+                        notes: notes,
+                        timestamp: new Date().toISOString()
+                    });
+                    saveUserData();
+                    updateMoodDisplay();
+                    document.body.removeChild(modal);
+                    showMessage('Mood updated successfully!', 'success');
+                } else {
+                    showMessage('Please select a mood rating', 'error');
+                }
+            });
+        }
+        
+        // Navigation Functions
+        function navigateToChat() {
+            window.location.href = 'chat-with-capy.html';
+        }
+        
+        function showMoodHistory() {
+            if (window.userData.moodHistory.length === 0) {
+                showMessage('No mood history recorded yet. Click "Update Mood" to get started!', 'info');
+                return;
+            }
+            
+            let historyHTML = '<div style="max-height: 300px; overflow-y: auto;">';
+            // Show in reverse chronological order (newest first)
+            [...window.userData.moodHistory].reverse().forEach(entry => {
+                const moodMap = {
+                    1: '😢 Very Sad',
+                    2: '😞 Sad', 
+                    3: '😐 Neutral',
+                    4: '🙂 Happy',
+                    5: '😊 Very Happy'
+                };
+                
+                historyHTML += `
+                    <div style="padding: 10px; border-bottom: 1px solid #eee;">
+                        <div style="font-weight: 600; color: #333;">${moodMap[entry.rating]}</div>
+                        ${entry.notes ? `<div style="font-size: 14px; color: #666; margin: 5px 0;">${entry.notes}</div>` : ''}
+                        <div style="font-size: 12px; color: #888;">${formatDateTime(entry.timestamp)}</div>
+                    </div>
+                `;
+            });
+            historyHTML += '</div>';
+            
+            const modal = createModal('Mood History', historyHTML);
+            document.body.appendChild(modal);
+        }
+        
+        function showProfile() {
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+            const profileHTML = `
+                <div class="detail-item">
+                    <div class="detail-label">Name</div>
+                    <div class="detail-value">${userData.name || 'Not set'}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Email</div>
+                    <div class="detail-value">${userData.email || 'Not set'}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Role</div>
+                    <div class="detail-value">${userData.role || 'Student'}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Total Subjects</div>
+                    <div class="detail-value">${window.userData.subjects.length}</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Chat Messages</div>
+                    <div class="detail-value">${JSON.parse(localStorage.getItem('chatHistory') || '[]').length}</div>
+                </div>
+                <button class="btn-full-width" id="editProfile" style="margin-top: 20px; background: #2196F3;">Edit Profile</button>
+            `;
+            
+            const modal = createModal('Profile', profileHTML);
+            document.body.appendChild(modal);
+            
+            document.getElementById('editProfile').addEventListener('click', function() {
+                showMessage('Profile editing feature coming soon!', 'info');
+            });
+        }
+        
+        function showSchedule() {
+            const scheduleHTML = `
+                <div style="text-align: center; padding: 30px; color: #666;">
+                    <div style="font-size: 48px; margin-bottom: 15px;">📅</div>
+                    <h3>Schedule Management</h3>
+                    <p>Schedule feature is under development.</p>
+                    <p>You can add upcoming events in the "Upcoming Events & Deadlines" section.</p>
+                </div>
+            `;
+            
+            const modal = createModal('Schedule', scheduleHTML);
+            document.body.appendChild(modal);
+        }
+        
+        function showResources() {
+            const resourcesHTML = `
+                <div class="resources-grid">
+                    <div class="resource-card" onclick="openResource('study')">
+                        <div class="resource-icon">📚</div>
+                        <div class="resource-title">Study Techniques</div>
+                        <div class="resource-desc">Effective methods for exam preparation</div>
+                    </div>
+                    <div class="resource-card" onclick="openResource('stress')">
+                        <div class="resource-icon">🧘</div>
+                        <div class="resource-title">Stress Management</div>
+                        <div class="resource-desc">Guided meditation for students</div>
+                    </div>
+                    <div class="resource-card" onclick="openResource('peer')">
+                        <div class="resource-icon">👥</div>
+                        <div class="resource-title">Peer Support</div>
+                        <div class="resource-desc">Connect with study buddies</div>
+                    </div>
+                </div>
+            `;
+            
+            const modal = createModal('Recommended Resources', resourcesHTML);
+            document.body.appendChild(modal);
+        }
+        
+        function openResource(type) {
+            let urls = {
+                'study': 'https://www.studygs.net/',
+                'stress': 'https://www.mindful.org/',
+                'peer': 'https://www.studentcrowd.com/'
+            };
+            
+            if (urls[type]) {
+                window.open(urls[type], '_blank');
+            }
+        }
+        function createModal(title, content) {
+            const modal = document.createElement('div');
+            modal.className = 'subject-modal';
+            modal.innerHTML = `
+                <div class="subject-modal-content">
+                    <div class="subject-modal-header">
+                        <h3>${title}</h3>
+                        <span class="close-modal">&times;</span>
+                    </div>
+                    <div class="subject-details">
+                        ${content}
+                    </div>
+                </div>
+            `;
+            
+            // Add event listeners
+            modal.querySelector('.close-modal').addEventListener('click', function() {
+                document.body.removeChild(modal);
+            });
+            
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    document.body.removeChild(modal);
+                }
+            });
+            
+            return modal;
+        }
+        
+        function showMessage(message, type) {
+            const msgDiv = document.createElement('div');
+            let bgColor = '#4CAF50'; // success
+            
+            if (type === 'error') {
+                bgColor = '#F44336';
+            } else if (type === 'info') {
+                bgColor = '#2196F3';
+            } else if (type === 'warning') {
+                bgColor = '#FFC107';
+            }
+            
+            msgDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 5px;
+                color: white;
+                font-weight: 500;
+                z-index: 10000;
+                background: ${bgColor};
+            `;
+            msgDiv.textContent = message;
+            document.body.appendChild(msgDiv);
+            
+            setTimeout(() => {
+                document.body.removeChild(msgDiv);
+            }, 3000);
+        }
+        
+        function formatDateTime(isoString) {
+            const date = new Date(isoString);
+            return date.toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
+        // Existing functions (keeping the original ones but integrating with new data structure)
+        function renderMarksChart() {
+            const chartContainer = document.getElementById('marksChart');
+            if (!chartContainer) return;
+            
+            if (window.userData.subjects.length === 0) {
+                chartContainer.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">No subjects added yet</div>';
+                return;
+            }
+            
+            // Sort subjects by marks and show top 5
+            const sortedSubjects = [...window.userData.subjects]
+                .sort((a, b) => b.marks - a.marks)
+                .slice(0, 5);
+            
+            let chartHTML = '<div style="display: flex; align-items: flex-end; height: 100%; gap: 10px; justify-content: center;">';
+            sortedSubjects.forEach(subject => {
+                const height = (subject.marks / 100) * 80;
+                const displayName = subject.name.length > 15 ? subject.name.substring(0, 15) + '...' : subject.name;
+                chartHTML += `
+                    <div style="display: flex; flex-direction: column; align-items: center; cursor: pointer;" class="subject-bar" data-subject="${subject.name}" data-marks="${subject.marks}">
+                        <div style="width: 30px; height: ${height}px; background: #fe8400; border-radius: 4px;"></div>
+                        <div style="font-size: 10px; margin-top: 5px;">${displayName}</div>
+                    </div>
+                `;
+            });
+            chartHTML += '</div>';
+            chartContainer.innerHTML = chartHTML;
+            
+            // Add click events to subject bars
+            document.querySelectorAll('.subject-bar').forEach(bar => {
+                bar.addEventListener('click', function() {
+                    const subjectName = this.getAttribute('data-subject');
+                    const marks = this.getAttribute('data-marks');
+                    showSubjectDetails(subjectName, marks);
+                });
+            });
+        }
+        
+        function showSubjectDetails(subjectName, marks) {
+            const subject = window.userData.subjects.find(s => s.name === subjectName);
+            if (!subject) return;
+            
+            const modal = createModal(subjectName, `
+                <div class="detail-item">
+                    <div class="detail-label">Current Marks</div>
+                    <div class="detail-value">${marks}%</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">Last Updated</div>
+                    <div class="detail-value">${formatDateTime(new Date().toISOString())}</div>
+                </div>
+                <button class="btn-full-width" id="updateSubjectMarks" style="margin-top: 20px; background: #2196F3;">Update Marks</button>
+            `);
+            
+            document.body.appendChild(modal);
+            
+            document.getElementById('updateSubjectMarks').addEventListener('click', function() {
+                const updateModal = createModal(`Update ${subjectName} Marks`, `
+                    <div class="detail-item">
+                        <div class="detail-label">New Marks (%)</div>
+                        <input type="number" id="newMarks" class="wellness-input" min="0" max="100" value="${marks}" placeholder="e.g. 85">
+                    </div>
+                    <button class="btn-full-width" id="saveNewMarks" style="margin-top: 20px;">Update Marks</button>
+                `);
+                
+                document.body.appendChild(updateModal);
+                document.body.removeChild(modal);
+                
+                document.getElementById('saveNewMarks').addEventListener('click', function() {
+                    const newMarks = parseInt(document.getElementById('newMarks').value);
+                    if (!isNaN(newMarks) && newMarks >= 0 && newMarks <= 100) {
+                        subject.marks = newMarks;
+                        saveUserData();
+                        updateAcademicDisplay();
+                        renderMarksChart();
+                        document.body.removeChild(updateModal);
+                        showMessage('Marks updated successfully!', 'success');
+                    } else {
+                        showMessage('Please enter valid marks (0-100)', 'error');
+                    }
+                });
+            });
+        }
     </script>
     <script>
         // Simple chart rendering for marks
