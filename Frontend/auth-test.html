@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication Test - CapyCares</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .test-section {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+        }
+        .test-result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo-section">
+            <div class="logo">
+                <img src="images/Logo.png" alt="CapyCares Logo" class="logo-img">
+            </div>
+            <h1 class="logo-text">Auth Test</h1>
+        </div>
+        <nav class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="student-login.html">Student Login</a>
+            <a href="admin-login.html">Admin Login</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1>Authentication System Test</h1>
+        
+        <div class="test-section">
+            <h3>Backend Status</h3>
+            <button onclick="testBackendConnection()" class="btn">Test Backend Connection</button>
+            <div id="backendResult" class="test-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Student Authentication</h3>
+            <form id="studentTestForm">
+                <div class="form-group">
+                    <input type="email" id="studentEmail" class="form-input" placeholder="Student Email" value="test@cmrit.ac.in">
+                </div>
+                <div class="form-group">
+                    <input type="password" id="studentPassword" class="form-input" placeholder="Password" value="Test1234">
+                </div>
+                <button type="submit" class="btn">Test Student Login</button>
+                <button type="button" onclick="testStudentSignup()" class="btn" style="background-color: #28a745;">Test Student Signup</button>
+            </form>
+            <div id="studentResult" class="test-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Admin Authentication</h3>
+            <form id="adminTestForm">
+                <div class="form-group">
+                    <input type="email" id="adminEmail" class="form-input" placeholder="Admin Email" value="admin@cmrit.ac.in">
+                </div>
+                <div class="form-group">
+                    <input type="password" id="adminPassword" class="form-input" placeholder="Password" value="Admin123">
+                </div>
+                <button type="submit" class="btn">Test Admin Login</button>
+                <button type="button" onclick="testAdminSignup()" class="btn" style="background-color: #28a745;">Test Admin Signup</button>
+            </form>
+            <div id="adminResult" class="test-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Current Session</h3>
+            <div id="sessionInfo" class="test-result info">
+                Checking session status...
+            </div>
+            <button onclick="clearSession()" class="btn" style="background-color: #dc3545;">Clear Session</button>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        // Test backend connection
+        async function testBackendConnection() {
+            const resultDiv = document.getElementById('backendResult');
+            try {
+                const response = await fetch('http://localhost:5000/api/test');
+                if (response.ok) {
+                    resultDiv.innerHTML = '✅ Backend is running and responding';
+                    resultDiv.className = 'test-result success';
+                } else {
+                    resultDiv.innerHTML = '⚠️ Backend responded but with error: ' + response.status;
+                    resultDiv.className = 'test-result error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '❌ Backend connection failed: ' + error.message;
+                resultDiv.className = 'test-result error';
+            }
+        }
+
+        // Test student signup
+        async function testStudentSignup() {
+            const resultDiv = document.getElementById('studentResult');
+            const email = document.getElementById('studentEmail').value;
+            const password = document.getElementById('studentPassword').value;
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/auth/student/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: 'Test Student',
+                        email: email,
+                        password: password,
+                        confirmPassword: password
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    resultDiv.innerHTML = '✅ Student signup successful: ' + JSON.stringify(data.user);
+                    resultDiv.className = 'test-result success';
+                } else {
+                    resultDiv.innerHTML = '❌ Student signup failed: ' + data.error;
+                    resultDiv.className = 'test-result error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '❌ Student signup error: ' + error.message;
+                resultDiv.className = 'test-result error';
+            }
+        }
+
+        // Test admin signup
+        async function testAdminSignup() {
+            const resultDiv = document.getElementById('adminResult');
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/auth/admin/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: 'Test Admin',
+                        email: email,
+                        password: password,
+                        confirmPassword: password
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    resultDiv.innerHTML = '✅ Admin signup successful: ' + JSON.stringify(data.user);
+                    resultDiv.className = 'test-result success';
+                } else {
+                    resultDiv.innerHTML = '❌ Admin signup failed: ' + data.error;
+                    resultDiv.className = 'test-result error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '❌ Admin signup error: ' + error.message;
+                resultDiv.className = 'test-result error';
+            }
+        }
+
+        // Check session status
+        function checkSession() {
+            const sessionDiv = document.getElementById('sessionInfo');
+            const token = localStorage.getItem('userToken');
+            const userData = localStorage.getItem('userData');
+            
+            if (token && userData) {
+                sessionDiv.innerHTML = `✅ Active session<br>Token: ${token.substring(0, 20)}...<br>User: ${userData}`;
+                sessionDiv.className = 'test-result success';
+            } else {
+                sessionDiv.innerHTML = '❌ No active session';
+                sessionDiv.className = 'test-result error';
+            }
+        }
+
+        // Clear session
+        function clearSession() {
+            localStorage.removeItem('userToken');
+            localStorage.removeItem('userData');
+            checkSession();
+            document.getElementById('studentResult').innerHTML = '';
+            document.getElementById('adminResult').innerHTML = '';
+        }
+
+        // Form submissions
+        document.getElementById('studentTestForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('studentEmail').value;
+            const password = document.getElementById('studentPassword').value;
+            performStudentLogin(email, password);
+        });
+
+        document.getElementById('adminTestForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+            performAdminLogin(email, password);
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            testBackendConnection();
+            checkSession();
+        });
+    </script>
+</body>
+</html>

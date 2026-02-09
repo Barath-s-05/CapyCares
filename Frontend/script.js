@@ -3,7 +3,19 @@
 // ================================
 
 // BACKEND BASE URL (FIXED)
-const API_BASE = 'http://localhost:8080/api';
+const API_BASE = 'http://localhost:5000/api';
+
+// --------------------
+// Logout Function
+// --------------------
+function logout() {
+    localStorage.removeItem('userToken');
+    localStorage.removeItem('userData');
+    showMessage('Logged out successfully', 'success');
+    setTimeout(() => {
+        window.location.href = 'index.html';
+    }, 1000);
+}
 
 // --------------------
 // Password validation
@@ -141,19 +153,50 @@ function showMessage(message, type = 'info') {
 }
 
 // --------------------
+// Admin Signup
+// --------------------
+async function performAdminSignup(name, email, password, confirmPassword) {
+    try {
+        const response = await fetch(`${API_BASE}/auth/admin/signup`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, password, confirmPassword })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showMessage('Admin account created successfully!', 'success');
+            localStorage.setItem('userToken', data.token);
+            localStorage.setItem('userData', JSON.stringify(data.user));
+
+            setTimeout(() => {
+                window.location.href = 'counselor-dashboard.html';
+            }, 1500);
+        } else {
+            showMessage(data.error || 'Admin signup failed', 'error');
+        }
+    } catch (err) {
+        console.error(err);
+        showMessage('Admin signup failed', 'error');
+    }
+}
+
+// --------------------
 // Form Bindings
 // --------------------
 document.addEventListener('DOMContentLoaded', () => {
 
-    const signupForm = document.getElementById('studentSignupForm');
-    if (signupForm) {
-        signupForm.addEventListener('submit', e => {
+    // Student Signup Form
+    const studentSignupForm = document.getElementById('studentSignupForm');
+    if (studentSignupForm) {
+        studentSignupForm.addEventListener('submit', e => {
             e.preventDefault();
 
-            const name = signupForm.querySelector('[placeholder="Full Name"]').value.trim();
-            const email = signupForm.querySelector('[placeholder="Email Address"]').value.trim();
-            const password = signupForm.querySelector('[placeholder="Password"]').value;
-            const confirmPassword = signupForm.querySelector('[placeholder="Confirm Password"]').value;
+            const name = studentSignupForm.querySelector('[placeholder="Full Name"]').value.trim();
+            const email = studentSignupForm.querySelector('[placeholder="Email Address"]').value.trim();
+            const password = studentSignupForm.querySelector('[placeholder="Password"]').value;
+            const confirmPassword = studentSignupForm.querySelector('[placeholder="Confirm Password"]').value;
 
             if (!email.endsWith('@cmrit.ac.in')) {
                 return showMessage('Use @cmrit.ac.in email', 'error');
@@ -171,15 +214,60 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const loginForm = document.getElementById('studentLoginForm');
-    if (loginForm) {
-        loginForm.addEventListener('submit', e => {
+    // Student Login Form
+    const studentLoginForm = document.getElementById('studentLoginForm');
+    if (studentLoginForm) {
+        studentLoginForm.addEventListener('submit', e => {
             e.preventDefault();
 
-            const email = loginForm.querySelector('input[type="email"]').value.trim();
-            const password = loginForm.querySelector('input[type="password"]').value;
+            const email = studentLoginForm.querySelector('input[type="email"]').value.trim();
+            const password = studentLoginForm.querySelector('input[type="password"]').value;
 
             performStudentLogin(email, password);
+        });
+    }
+
+    // Admin Login Form
+    const adminLoginForm = document.getElementById('adminLoginForm');
+    if (adminLoginForm) {
+        adminLoginForm.addEventListener('submit', e => {
+            e.preventDefault();
+
+            const email = adminLoginForm.querySelector('input[type="email"]').value.trim();
+            const password = adminLoginForm.querySelector('input[type="password"]').value;
+
+            if (!email.endsWith('@cmrit.ac.in')) {
+                return showMessage('Use @cmrit.ac.in email', 'error');
+            }
+
+            performAdminLogin(email, password);
+        });
+    }
+
+    // Admin Signup Form
+    const adminSignupForm = document.getElementById('adminSignupForm');
+    if (adminSignupForm) {
+        adminSignupForm.addEventListener('submit', e => {
+            e.preventDefault();
+
+            const name = adminSignupForm.querySelector('[placeholder="Full Name"]').value.trim();
+            const email = adminSignupForm.querySelector('[placeholder="Work Email"]').value.trim();
+            const password = adminSignupForm.querySelector('[placeholder="Password"]').value;
+            const confirmPassword = adminSignupForm.querySelector('[placeholder="Confirm Password"]').value;
+
+            if (!email.endsWith('@cmrit.ac.in')) {
+                return showMessage('Use @cmrit.ac.in email', 'error');
+            }
+
+            if (!isValidPassword(password)) {
+                return showMessage('Weak password', 'error');
+            }
+
+            if (password !== confirmPassword) {
+                return showMessage('Passwords do not match', 'error');
+            }
+
+            performAdminSignup(name, email, password, confirmPassword);
         });
     }
 });
