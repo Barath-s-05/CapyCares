@@ -73,68 +73,42 @@
     </main>
 
     <script>
-        // Check authentication and show appropriate content
+        // Check authentication first
         document.addEventListener('DOMContentLoaded', function() {
             // Check if user is authenticated
             if (!isAuthenticated()) {
-                showAuthRequiredScreen();
+                // Show auth required message and hide chat
+                document.querySelector('.chat-container').innerHTML = `
+                    <div style="max-width: 500px; margin: 50px auto; padding: 30px; text-align: center; background: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+                        <div style="font-size: 60px; margin-bottom: 20px;">💬</div>
+                        <h2 style="color: #333; margin-bottom: 15px;">Chat with Capy</h2>
+                        <p style="color: #666; margin-bottom: 30px; line-height: 1.6;">
+                            Please login or signup to access the AI chat support.<br>
+                            Your conversations will be saved and secured.
+                        </p>
+                        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                            <a href="student-login.html" class="btn" style="background: #fe8400; color: white; text-decoration: none; padding: 12px 25px;">
+                                Student Login
+                            </a>
+                            <a href="student-signup.html" class="btn" style="background: #28a745; color: white; text-decoration: none; padding: 12px 25px;">
+                                Student Signup
+                            </a>
+                        </div>
+                        <div style="margin-top: 20px;">
+                            <a href="index.html" style="color: #666; text-decoration: none; font-size: 14px;">
+                                ← Back to Home
+                            </a>
+                        </div>
+                    </div>
+                `;
                 return;
             }
             
-            // Initialize chat components
-            initializeChat();
+            // User is authenticated - initialize chat normally
+            initializeChatComponents();
         });
         
-        function showAuthRequiredScreen() {
-            // Hide the chat container
-            document.querySelector('.chat-container').style.display = 'none';
-            
-            // Create auth required screen
-            const authScreen = document.createElement('div');
-            authScreen.id = 'authRequiredScreen';
-            authScreen.style.cssText = `
-                max-width: 500px;
-                margin: 50px auto;
-                padding: 30px;
-                text-align: center;
-                background: white;
-                border-radius: 15px;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            `;
-            
-            authScreen.innerHTML = `
-                <div style="font-size: 60px; margin-bottom: 20px;">💬</div>
-                <h2 style="color: #333; margin-bottom: 15px;">Chat with Capy</h2>
-                <p style="color: #666; margin-bottom: 30px; line-height: 1.6;">
-                    Please login or signup to access the AI chat support.<br>
-                    Your conversations will be saved and secured.
-                </p>
-                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                    <a href="student-login.html" class="btn" style="background: #fe8400; color: white; text-decoration: none; padding: 12px 25px;">
-                        Student Login
-                    </a>
-                    <a href="student-signup.html" class="btn" style="background: #28a745; color: white; text-decoration: none; padding: 12px 25px;">
-                        Student Signup
-                    </a>
-                </div>
-                <div style="margin-top: 20px;">
-                    <a href="index.html" style="color: #666; text-decoration: none; font-size: 14px;">
-                        ← Back to Home
-                    </a>
-                </div>
-            `;
-            
-            // Insert after header
-            document.querySelector('header').insertAdjacentElement('afterend', authScreen);
-        }
-        
-        function initializeChat() {
-            // Show the chat container
-            document.querySelector('.chat-container').style.display = 'block';
-            
-            // Load chat history
-            loadChatHistory();
-            
+        function initializeChatComponents() {
             // Set up logout functionality
             const logoutLink = document.getElementById('logoutLink');
             if (logoutLink) {
@@ -145,16 +119,8 @@
                 });
             }
             
-            // Set up clear chat button
-            const clearChatBtn = document.getElementById('clearChatBtn');
-            if (clearChatBtn) {
-                clearChatBtn.addEventListener('click', function() {
-                    if (confirm('Are you sure you want to clear your chat history? This cannot be undone.')) {
-                        localStorage.removeItem('chatHistory');
-                        window.location.reload();
-                    }
-                });
-            }
+            // Load chat history
+            loadChatHistory();
         }
         
         function loadChatHistory() {
