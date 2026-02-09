@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Debug - CapyCares</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .debug-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .error { color: #dc3545; }
+        .success { color: #28a745; }
+        .info { color: #17a2b8; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo-section">
+            <div class="logo">
+                <img src="images/Logo.png" alt="CapyCares Logo" class="logo-img">
+            </div>
+            <h1 class="logo-text">Login Debug</h1>
+        </div>
+        <nav class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="student-login.html">Student Login</a>
+            <a href="chat-with-capy.html">Chat</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h2>🔍 Login Debug Tool</h2>
+        
+        <div class="debug-info">
+            <h3>Current Session Status:</h3>
+            <div id="sessionStatus">Checking...</div>
+        </div>
+
+        <div class="debug-info">
+            <h3>Test Login:</h3>
+            <form id="debugLoginForm">
+                <div class="form-group">
+                    <input type="email" id="email" class="form-input" placeholder="Email Address" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="password" class="form-input" placeholder="Password" required>
+                </div>
+                <button type="submit" class="btn">Test Login</button>
+            </form>
+            <div id="loginResult" style="margin-top: 15px;"></div>
+        </div>
+
+        <div class="debug-info">
+            <h3>Working Credentials:</h3>
+            <ul>
+                <li><strong>Student:</strong> kesh23csds@cmrit.ac.in / Student123</li>
+                <li><strong>Admin:</strong> admin@cmrit.ac.in / Admin123</li>
+                <li><strong>Counselor:</strong> priya.counselor@cmrit.ac.in / Counselor123</li>
+            </ul>
+        </div>
+
+        <div class="debug-info">
+            <h3>Quick Actions:</h3>
+            <button onclick="testWorkingStudent()" class="btn" style="background: #28a745;">Test Working Student Login</button>
+            <button onclick="clearSession()" class="btn" style="background: #dc3545;">Clear Session</button>
+            <button onclick="checkCurrentSession()" class="btn">Refresh Session Status</button>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        // Debug functions
+        function checkCurrentSession() {
+            const statusDiv = document.getElementById('sessionStatus');
+            if (isAuthenticated()) {
+                const user = getCurrentUser();
+                statusDiv.innerHTML = `
+                    <span class="success">✅ Authenticated</span><br>
+                    Name: ${user ? user.name : 'Unknown'}<br>
+                    Email: ${user ? user.email : 'Unknown'}<br>
+                    Role: ${user ? user.role : 'Unknown'}
+                `;
+            } else {
+                statusDiv.innerHTML = '<span class="error">❌ Not authenticated</span>';
+            }
+        }
+
+        function testWorkingStudent() {
+            document.getElementById('email').value = 'kesh23csds@cmrit.ac.in';
+            document.getElementById('password').value = 'Student123';
+            document.getElementById('debugLoginForm').dispatchEvent(new Event('submit'));
+        }
+
+        function clearSession() {
+            localStorage.clear();
+            checkCurrentSession();
+            document.getElementById('loginResult').innerHTML = '<span class="info">Session cleared</span>';
+        }
+
+        // Form submission
+        document.getElementById('debugLoginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const resultDiv = document.getElementById('loginResult');
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            
+            resultDiv.innerHTML = '<span class="info">Testing login...</span>';
+            
+            try {
+                await performStudentLogin(email, password);
+                // Check if login was successful
+                setTimeout(() => {
+                    if (isAuthenticated()) {
+                        resultDiv.innerHTML = '<span class="success">✅ Login successful!</span>';
+                        checkCurrentSession();
+                    } else {
+                        resultDiv.innerHTML = '<span class="error">❌ Login failed - check credentials</span>';
+                    }
+                }, 1500);
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ Error: ${error.message}</span>`;
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            checkCurrentSession();
+        });
+    </script>
+</body>
+</html>
