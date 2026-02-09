@@ -646,8 +646,11 @@
     <script>
         // Check authentication first
         document.addEventListener('DOMContentLoaded', function() {
+            // Check session validity
+            checkSessionValidity();
+            
             // Check if user is authenticated
-            if (!localStorage.getItem('userToken')) {
+            if (!isAuthenticated()) {
                 alert('Please login to access the dashboard');
                 window.location.href = 'student-login.html';
                 return;
@@ -697,11 +700,13 @@
             // Logout functionality
             const logoutLink = document.getElementById('logoutLink');
             if (logoutLink) {
-                logoutLink.style.display = 'inline-block';
-                logoutLink.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    logout();
-                });
+                if (isAuthenticated()) {
+                    logoutLink.style.display = 'inline-block';
+                    logoutLink.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        logout();
+                    });
+                }
             }
         }
         

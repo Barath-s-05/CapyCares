@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session Management Test - CapyCares</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .test-section {
+            background: #f8f9fa;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            border: 1px solid #dee2e6;
+        }
+        .test-result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        .warning { background-color: #fff3cd; color: #856404; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo-section">
+            <div class="logo">
+                <img src="images/Logo.png" alt="CapyCares Logo" class="logo-img">
+            </div>
+            <h1 class="logo-text">Session Test</h1>
+        </div>
+        <nav class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="student-login.html">Login</a>
+            <a href="student-signup.html">Signup</a>
+            <a href="#" id="logoutLink" style="display: none;">Logout</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <h1>🔒 Session Management Test</h1>
+        
+        <div class="test-section">
+            <h3>Current Session Status</h3>
+            <div id="sessionStatus" class="test-result info">Checking...</div>
+            <button onclick="refreshSessionStatus()" class="btn">Refresh Status</button>
+            <button onclick="simulateActivity()" class="btn" style="background-color: #28a745;">Simulate Activity</button>
+        </div>
+
+        <div class="test-section">
+            <h3>Login Simulation</h3>
+            <p>Simulate a login to test session persistence:</p>
+            <button onclick="simulateLogin()" class="btn" style="background-color: #007bff;">Simulate Login</button>
+            <button onclick="clearTestData()" class="btn" style="background-color: #dc3545;">Clear Test Data</button>
+        </div>
+
+        <div class="test-section">
+            <h3>Session Expiration Test</h3>
+            <p>Test session expiration (normally 30 days, shortened for testing):</p>
+            <button onclick="testExpiration()" class="btn" style="background-color: #ffc107;">Test Expiration</button>
+            <button onclick="resetExpiration()" class="btn">Reset Expiration Timer</button>
+        </div>
+
+        <div class="test-section">
+            <h3>Manual Session Controls</h3>
+            <button onclick="logout()" class="btn" style="background-color: #dc3545;">Logout</button>
+            <button onclick="checkSessionValidity()" class="btn">Check Validity</button>
+        </div>
+
+        <div class="test-section">
+            <h3>Session Data</h3>
+            <div id="sessionData" class="test-result info">Loading session data...</div>
+            <button onclick="showSessionData()" class="btn">Show Raw Data</button>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshSessionStatus();
+            showSessionData();
+            setupLogoutLink();
+        });
+
+        function setupLogoutLink() {
+            const logoutLink = document.getElementById('logoutLink');
+            if (logoutLink) {
+                if (isAuthenticated()) {
+                    logoutLink.style.display = 'inline-block';
+                    logoutLink.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        logout();
+                    });
+                }
+            }
+        }
+
+        function refreshSessionStatus() {
+            const statusDiv = document.getElementById('sessionStatus');
+            
+            if (isAuthenticated()) {
+                const user = getCurrentUser();
+                const lastActivity = localStorage.getItem('lastActivity');
+                const isExpired = isSessionExpired();
+                
+                let statusHTML = `
+                    ✅ Authenticated Session<br>
+                    User: ${user ? user.name : 'Unknown'}<br>
+                    Email: ${user ? user.email : 'Unknown'}<br>
+                    Role: ${user ? user.role : 'Unknown'}<br>
+                `;
+                
+                if (lastActivity) {
+                    const activityDate = new Date(parseInt(lastActivity));
+                    statusHTML += `Last Activity: ${activityDate.toLocaleString()}<br>`;
+                }
+                
+                statusHTML += `Status: ${isExpired ? '❌ Expired' : '✅ Active'}`;
+                
+                statusDiv.innerHTML = statusHTML;
+                statusDiv.className = isExpired ? 'test-result error' : 'test-result success';
+            } else {
+                statusDiv.innerHTML = '❌ No active session';
+                statusDiv.className = 'test-result error';
+            }
+        }
+
+        function showSessionData() {
+            const dataDiv = document.getElementById('sessionData');
+            const token = localStorage.getItem('userToken');
+            const userData = localStorage.getItem('userData');
+            const lastActivity = localStorage.getItem('lastActivity');
+            
+            let dataHTML = '<pre style="text-align: left; font-size: 12px;">';
+            dataHTML += `Token: ${token ? token.substring(0, 30) + '...' : 'None'}\n`;
+            dataHTML += `User Data: ${userData || 'None'}\n`;
+            dataHTML += `Last Activity: ${lastActivity ? new Date(parseInt(lastActivity)).toISOString() : 'None'}\n`;
+            dataHTML += '</pre>';
+            
+            dataDiv.innerHTML = dataHTML;
+        }
+
+        function simulateLogin() {
+            // Simulate a successful login
+            const fakeToken = 'test-token-' + Date.now();
+            const fakeUser = {
+                id: 'test-user-123',
+                name: 'Test User',
+                email: 'test@cmrit.ac.in',
+                role: 'student'
+            };
+            
+            localStorage.setItem('userToken', fakeToken);
+            localStorage.setItem('userData', JSON.stringify(fakeUser));
+            updateLastActivity();
+            
+            showMessage('Login simulation successful!', 'success');
+            refreshSessionStatus();
+            showSessionData();
+            setupLogoutLink();
+        }
+
+        function simulateActivity() {
+            updateLastActivity();
+            showMessage('Activity simulated - session extended!', 'success');
+            refreshSessionStatus();
+        }
+
+        function testExpiration() {
+            // Set last activity to 31 days ago to test expiration
+            const thirtyOneDaysAgo = Date.now() - (31 * 24 * 60 * 60 * 1000);
+            localStorage.setItem('lastActivity', thirtyOneDaysAgo.toString());
+            
+            showMessage('Expiration test set - checking validity...', 'warning');
+            setTimeout(() => {
+                checkSessionValidity();
+                refreshSessionStatus();
+            }, 1000);
+        }
+
+        function resetExpiration() {
+            updateLastActivity();
+            showMessage('Expiration timer reset!', 'success');
+            refreshSessionStatus();
+        }
+
+        function clearTestData() {
+            // Clear only test-related data
+            localStorage.removeItem('userToken');
+            localStorage.removeItem('userData');
+            localStorage.removeItem('lastActivity');
+            
+            showMessage('Test data cleared!', 'success');
+            refreshSessionStatus();
+            showSessionData();
+            setupLogoutLink();
+        }
+
+        // Override the default logout to show a message
+        const originalLogout = logout;
+        function logout() {
+            originalLogout();
+            setTimeout(() => {
+                refreshSessionStatus();
+                showSessionData();
+                setupLogoutLink();
+            }, 1500);
+        }
+    </script>
+</body>
+</html>

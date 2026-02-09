@@ -6,11 +6,71 @@
 const API_BASE = 'http://localhost:5000/api';
 
 // --------------------
+// Session Management
+// --------------------
+function isAuthenticated() {
+    const token = localStorage.getItem('userToken');
+    const userData = localStorage.getItem('userData');
+    
+    // Check if we have both token and user data
+    if (!token || !userData) {
+        return false;
+    }
+    
+    // In a real implementation, we would validate the JWT token
+    // For now, we'll assume the session is valid if both exist
+    return true;
+}
+
+function getCurrentUser() {
+    const userData = localStorage.getItem('userData');
+    return userData ? JSON.parse(userData) : null;
+}
+
+function clearSession() {
+    localStorage.removeItem('userToken');
+    localStorage.removeItem('userData');
+    localStorage.removeItem('lastActivity');
+}
+
+// Update last activity timestamp
+function updateLastActivity() {
+    localStorage.setItem('lastActivity', Date.now().toString());
+}
+
+// Check if session has expired (30 days)
+function isSessionExpired() {
+    const lastActivity = localStorage.getItem('lastActivity');
+    if (!lastActivity) return true;
+    
+    const thirtyDaysInMillis = 30 * 24 * 60 * 60 * 1000;
+    const now = Date.now();
+    return (now - parseInt(lastActivity)) > thirtyDaysInMillis;
+}
+
+// Auto-logout if session expired
+function checkSessionValidity() {
+    if (isAuthenticated() && isSessionExpired()) {
+        clearSession();
+        if (!window.location.pathname.includes('login') && 
+            !window.location.pathname.includes('signup') && 
+            !window.location.pathname.includes('index.html')) {
+            alert('Your session has expired. Please login again.');
+            window.location.href = 'index.html';
+        }
+    }
+}
+
+// Update last activity on any user interaction
+document.addEventListener('click', updateLastActivity);
+document.addEventListener('keypress', updateLastActivity);
+document.addEventListener('mousemove', updateLastActivity);
+
+// --------------------
 // Logout Function
 // --------------------
 function logout() {
-    localStorage.removeItem('userToken');
-    localStorage.removeItem('userData');
+    clearSession();
     showMessage('Logged out successfully', 'success');
     setTimeout(() => {
         window.location.href = 'index.html';
@@ -45,7 +105,8 @@ async function performStudentLogin(email, password) {
             showMessage('Login successful! Redirecting...', 'success');
             localStorage.setItem('userToken', data.token);
             localStorage.setItem('userData', JSON.stringify(data.user));
-
+            updateLastActivity(); // Set initial activity timestamp
+                    
             setTimeout(() => {
                 window.location.href = 'student-dashboard.html';
             }, 1200);
@@ -75,7 +136,8 @@ async function performStudentSignup(name, email, password, confirmPassword) {
             showMessage('Account created successfully!', 'success');
             localStorage.setItem('userToken', data.token);
             localStorage.setItem('userData', JSON.stringify(data.user));
-
+            updateLastActivity(); // Set initial activity timestamp
+                    
             setTimeout(() => {
                 window.location.href = 'student-dashboard.html';
             }, 1500);
