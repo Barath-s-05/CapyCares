@@ -614,6 +614,15 @@ app.post("/api/chat", async (req, res) => {
 console.log("Groq Key Loaded:", process.env.GROQ_API_KEY ? "YES" : "NO");
 
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    service: 'capycares-backend'
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

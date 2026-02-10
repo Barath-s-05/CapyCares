@@ -2,6 +2,7 @@ services:
   - type: web
     name: capycares-backend
     env: node
+    plan: free
     buildCommand: npm install
     startCommand: npm start
     envVars:
@@ -15,3 +16,5 @@ services:
         sync: false
       - key: GROQ_API_KEY
         sync: false
+    healthCheckPath: /api/health
+    autoDeploy: false
