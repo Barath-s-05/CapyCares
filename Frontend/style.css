@@ -678,7 +678,7 @@ video.main-illustration-img:not([src])::before {
 
 .chat-messages {
     background: var(--white);
-    border-radius: 100px;
+    border-radius: 25px;
     padding: 30px;
     margin-bottom: 20px;
     min-height: 400px;
@@ -694,6 +694,38 @@ video.main-illustration-img:not([src])::before {
 
 .message.user {
     flex-direction: row-reverse;
+}
+
+/* Ensure proper text wrapping in message bubbles */
+.message-bubble {
+    background: var(--light-bg);
+    padding: 18px 22px;
+    border-radius: 18px;
+    max-width: 70%;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    color: var(--black);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    line-height: 1.5;
+}
+
+.message.user .message-bubble {
+    background: var(--primary-orange);
+    color: #FFFFFF;
+    padding: 18px 22px;
+    border-radius: 18px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    line-height: 1.5;
+}
+
+/* Handle long words and URLs */
+.message-bubble a,
+.message-bubble span {
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 .message-avatar {
@@ -741,16 +773,24 @@ video.main-illustration-img:not([src])::before {
 
 .message-bubble {
     background: var(--light-bg);
-    padding: 15px 20px;
-    border-radius: 100px;
+    padding: 18px 22px;
+    border-radius: 18px;
     max-width: 70%;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     color: var(--black);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
 }
 
 .message.user .message-bubble {
     background: var(--primary-orange);
     color: #FFFFFF;
+    padding: 18px 22px;
+    border-radius: 18px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
 }
 
 /* Welcome Message Styles */
