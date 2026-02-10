@@ -2,8 +2,8 @@
 // CapyCares Website JavaScript
 // ================================
 
-// BACKEND BASE URL (FIXED)
-const API_BASE = 'http://localhost:5000/api';
+// BACKEND BASE URL - Update this after deployment
+const API_BASE = 'http://localhost:5000/api'; // Change to your deployed backend URL
 
 // --------------------
 // Session Management
