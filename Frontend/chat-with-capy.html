@@ -73,52 +73,12 @@
     </main>
 
     <script>
-        // Check authentication first
+        // Initialize chat components immediately (no authentication)
         document.addEventListener('DOMContentLoaded', function() {
-            // Check if user is authenticated
-            if (!isAuthenticated()) {
-                // Show auth required message and hide chat
-                document.querySelector('.chat-container').innerHTML = `
-                    <div style="max-width: 500px; margin: 50px auto; padding: 30px; text-align: center; background: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
-                        <div style="font-size: 60px; margin-bottom: 20px;">💬</div>
-                        <h2 style="color: #333; margin-bottom: 15px;">Chat with Capy</h2>
-                        <p style="color: #666; margin-bottom: 30px; line-height: 1.6;">
-                            Please login or signup to access the AI chat support.<br>
-                            Your conversations will be saved and secured.
-                        </p>
-                        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                            <a href="student-login.html" class="btn" style="background: #fe8400; color: white; text-decoration: none; padding: 12px 25px;">
-                                Student Login
-                            </a>
-                            <a href="student-signup.html" class="btn" style="background: #28a745; color: white; text-decoration: none; padding: 12px 25px;">
-                                Student Signup
-                            </a>
-                        </div>
-                        <div style="margin-top: 20px;">
-                            <a href="index.html" style="color: #666; text-decoration: none; font-size: 14px;">
-                                ← Back to Home
-                            </a>
-                        </div>
-                    </div>
-                `;
-                return;
-            }
-            
-            // User is authenticated - initialize chat normally
             initializeChatComponents();
         });
         
         function initializeChatComponents() {
-            // Set up logout functionality
-            const logoutLink = document.getElementById('logoutLink');
-            if (logoutLink) {
-                logoutLink.style.display = 'inline-block';
-                logoutLink.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    logout();
-                });
-            }
-            
             // Load chat history
             loadChatHistory();
         }
@@ -377,8 +337,8 @@
               
               {/* Chat Input */}
               <div className="chat-input-container">
-                <div style="text-align: center; margin-bottom: 10px;">
-                  <button className="btn" id="clearChatBtn" style="background: #dc3545; padding: 8px 15px; font-size: 12px;">
+                <div style={{textAlign: 'center', marginBottom: '10px'}}>
+                  <button className="btn" id="clearChatBtn" style={{background: '#dc3545', padding: '8px 15px', fontSize: '12px'}}>
                     Clear Chat History
                   </button>
                 </div>
