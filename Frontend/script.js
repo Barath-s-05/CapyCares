@@ -3,7 +3,7 @@
 // ================================
 
 // BACKEND BASE URL - Update this after deployment
-const API_BASE = 'http://localhost:5000/api'; // Change to your deployed backend URL
+const API_BASE = 'https://capycares-backend.onrender.com/api';
 
 // --------------------
 // Session Management
