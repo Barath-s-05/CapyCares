@@ -98,10 +98,7 @@ function ChatWithCapy() {
           <a href="chat-with-capy.html">Chat with Capy</a>
           <a href="terms-conditions.html">T&C</a>
           <a href="interests.html">Interests</a>
-          <button className="dark-mode-toggle" id="darkModeToggle">
-            <i className="fas fa-moon"></i>
-            <span>Dark</span>
-          </button>
+          
         </nav>
       </header>
 
