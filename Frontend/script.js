@@ -2,8 +2,10 @@
 // CapyCares Website JavaScript
 // ================================
 
-// BACKEND BASE URL - Update this after deployment
-const API_BASE = 'https://capycares-backend.onrender.com/api';
+// BACKEND BASE URL - Dynamic for local and production testing
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+    ? 'http://localhost:5000/api'
+    : 'https://capycares-backend.onrender.com/api';
 
 // --------------------
 // Session Management

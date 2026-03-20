@@ -191,9 +191,27 @@
         <div id="root"></div>
     </main>
 
+    <script src="script.js"></script>
     <script>
-        // Initialize chat components immediately (no authentication)
+        // Check authentication and initialize chat components
         document.addEventListener('DOMContentLoaded', function() {
+            if (typeof checkSessionValidity === 'function') checkSessionValidity();
+            
+            if (typeof isAuthenticated === 'function' && !isAuthenticated()) {
+                alert('Please login to access the chat');
+                window.location.href = 'student-login.html';
+                return;
+            }
+            
+            const logoutLink = document.getElementById('logoutLink');
+            if (logoutLink && typeof isAuthenticated === 'function' && isAuthenticated()) {
+                logoutLink.style.display = 'inline-block';
+                logoutLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (typeof logout === 'function') logout();
+                });
+            }
+            
             initializeChatComponents();
         });
         
@@ -303,13 +321,16 @@
           const flagForCounselor = async (keyword, message) => {
             // Send data to the backend
             try {
-              const response = await fetch('http://localhost:5000/api/flag-message', {
+              const currentUser = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+              const userName = currentUser ? currentUser.name : 'Unknown Student';
+              
+              const response = await fetch(`${typeof API_BASE !== 'undefined' ? API_BASE : 'http://localhost:5000/api'}/flag-message`, {
                 method: 'POST',
                 headers: {
                   'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                  sender: 'Current User',
+                  sender: userName,
                   keyword: keyword,
                   message: message,
                   count: keywordCount[keyword]
@@ -357,7 +378,7 @@
             setIsLoading(true);
 
             try {
-              const res = await fetch("http://localhost:5000/api/chat", {
+              const res = await fetch(`${typeof API_BASE !== 'undefined' ? API_BASE : 'http://localhost:5000/api'}/chat`, {
                 method: "POST",
                 headers: {
                   "Content-Type": "application/json"
